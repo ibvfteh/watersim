@@ -1,0 +1,3 @@
+vulkan_pipeline:
+    Add support of selecting resterizer types: (FILL vs LINE)
+    Add Blending: Dynamic State!!
