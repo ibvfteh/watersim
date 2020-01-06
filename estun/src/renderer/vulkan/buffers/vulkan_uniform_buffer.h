@@ -26,7 +26,7 @@ namespace estun
         VulkanUniformBuffer();
         ~VulkanUniformBuffer();
 
-        void Update(UniformBufferObject& newUbo, uint32_t& currentImage);
+        void Update(UniformBufferObject& newUbo);
         std::vector<VkBuffer>* GetUniformBuffers();
         std::vector<VkDeviceMemory>* GetUniformBuffersMemory();
     };

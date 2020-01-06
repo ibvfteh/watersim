@@ -8,9 +8,10 @@ namespace estun
     VulkanGraphicsPipeline::VulkanGraphicsPipeline(
                 const std::string vertexShaderName,
                 const std::string fragmentShaderName,
-                VkDescriptorSetLayout* descriptorSetLayout
+                VulkanDescriptorSets* shaderDescriptorSets
                 )
     {
+        descriptorSets = shaderDescriptorSets;
         VkShaderModule vertShaderModule = ShaderManager::GetInstance()->GetShaderModule(vertexShaderName);
         VkShaderModule fragShaderModule = ShaderManager::GetInstance()->GetShaderModule(fragmentShaderName);
 
@@ -53,6 +54,7 @@ namespace estun
         viewport.height   = (float) swapChainExtent->height;
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
+        ES_CORE_INFO(swapChainExtent->width);
 
         VkRect2D scissor = {};
         scissor.offset   = {0, 0};
@@ -106,7 +108,7 @@ namespace estun
         VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
         pipelineLayoutInfo.sType          = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutInfo.setLayoutCount = 1;
-        pipelineLayoutInfo.pSetLayouts    = descriptorSetLayout;
+        pipelineLayoutInfo.pSetLayouts    = descriptorSets->GetDescriptorSetLayout();
 
         if (vkCreatePipelineLayout(*VulkanDeviceLocator::GetLogicalDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) 
         {
@@ -134,18 +136,14 @@ namespace estun
             ES_CORE_ASSERT("Failed to create graphics pipeline");
         }
 
-        vkDestroyShaderModule(*VulkanDeviceLocator::GetLogicalDevice(), fragShaderModule, nullptr);
-        vkDestroyShaderModule(*VulkanDeviceLocator::GetLogicalDevice(), vertShaderModule, nullptr);
-        if (vkCreatePipelineLayout(*VulkanDeviceLocator::GetLogicalDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) 
-        {
-            ES_CORE_CRITICAL("Failed to create pipeline layout");
-        }
+        //vkDestroyShaderModule(*VulkanDeviceLocator::GetLogicalDevice(), fragShaderModule, nullptr);
+        //vkDestroyShaderModule(*VulkanDeviceLocator::GetLogicalDevice(), vertShaderModule, nullptr);
     }
 
     VulkanGraphicsPipeline::~VulkanGraphicsPipeline()
     {
-        vkDestroyPipeline(*VulkanDeviceLocator::GetLogicalDevice(), graphicsPipeline, nullptr);
         vkDestroyPipelineLayout(*VulkanDeviceLocator::GetLogicalDevice(), pipelineLayout, nullptr);
+        vkDestroyPipeline(*VulkanDeviceLocator::GetLogicalDevice(), graphicsPipeline, nullptr);
     }
 
     VkPipeline* VulkanGraphicsPipeline::GetGraphicsPipeline()
@@ -156,5 +154,10 @@ namespace estun
     VkPipelineLayout* VulkanGraphicsPipeline::GetPipelineLayout()
     {
         return &pipelineLayout;
+    }
+
+    VulkanDescriptorSets* VulkanGraphicsPipeline::GetDescriptorSets()
+    {
+        return descriptorSets;
     }
 }

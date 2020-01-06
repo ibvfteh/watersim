@@ -1,11 +1,13 @@
 #include "renderer/vulkan/vulkan_context.h"
+#include "renderer/vulkan/material/vulkan_shader_manager.h"
 #include <iostream>
 
 namespace estun {
-    VulkanContext* VulkanContextLocator::context = nullptr;
-	VulkanContext::VulkanContext(GLFWwindow* windowHandle, GameInfo* gameInfo)
+    VulkanContext* VulkanContextLocator::currContext = nullptr;
+    
+	VulkanContext::VulkanContext(GLFWwindow* windowHandle, GameInfo* appGameInfo)
 	{
-        this->gameInfo = gameInfo;
+        gameInfo = appGameInfo;
         if (!windowHandle)
         {
 		    ES_CORE_ASSERT("Window handle is null!");
@@ -42,19 +44,28 @@ namespace estun {
         ES_CORE_INFO("color resources done");
         depthResources = new VulkanDepthResources(swapChain->GetSwapChainExtent(), device->GetMsaaSamples());
         ES_CORE_INFO("depth resources done");
-        framebuffers   = new VulkanFramebuffers(imageView, renderPass, swapChain->GetSwapChainExtent(), depthResources->GetDepthImageView(), colorResources->GetColorImageView());
+        framebuffers   = new VulkanFramebuffers(
+            imageView,
+            renderPass, 
+            swapChain->GetSwapChainExtent(), 
+            depthResources->GetDepthImageView(), 
+            colorResources->GetColorImageView());
+
         ES_CORE_INFO("frame buffers done");
        
         commandBuffers = new VulkanCommandBuffers(commandPool, swapChain->GetImageCount());
         ES_CORE_INFO("command buffers done");
-        semaphores     = new VulkanSemaphoresManager(swapChain->GetImageCount());
+        semaphores     = new VulkanSemaphoresManager(maxFramesInFlight, swapChain->GetImageCount());
         ES_CORE_INFO("semaphores done");
+        currentFrame = 0;
     }  
     
     void VulkanContext::Shutdown()
     {
         delete semaphores;
         CleanUpSwapChain();
+        ShaderManager::GetInstance()->CleanUp();
+        delete commandPool;
         delete device;
         VulkanDeviceLocator::Provide(nullptr);
         surface->Delete(instance);
@@ -72,6 +83,8 @@ namespace estun {
         imageView      = new VulkanImageView(swapChain);
         renderPass     = new VulkanRenderPass(*swapChain->GetSwapChainImageFormat(), device->GetMsaaSamples());
         
+        VulkanMaterialPoolLocator::RebuildPipelines();
+
         colorResources = new VulkanColorResources(swapChain, device->GetMsaaSamples());
         depthResources = new VulkanDepthResources(swapChain->GetSwapChainExtent(), device->GetMsaaSamples());
         framebuffers   = new VulkanFramebuffers(imageView, renderPass, swapChain->GetSwapChainExtent(), depthResources->GetDepthImageView(), colorResources->GetColorImageView());
@@ -81,15 +94,119 @@ namespace estun {
 
     void VulkanContext::CleanUpSwapChain()
     {
-        delete commandBuffers;
         delete depthResources;
         delete colorResources;
         delete framebuffers;
-        delete commandPool;
-        delete renderPass;
+        delete commandBuffers;
         delete imageView;
         delete swapChain;
+        delete renderPass;
     }
+    
+    void VulkanContext::Submit(VulkanVertexBuffer* vbo, VulkanIndexBuffer* ibo, VulkanMaterial* material)
+    {
+        vkDeviceWaitIdle(*device->GetLogicalDevice());
+
+        commandBuffers->InitCommandBuffers(renderPass, swapChain->GetSwapChainExtent(), framebuffers);
+
+        commandBuffers->BindShader(material->GetPipeline(), material->GetDescriptorSets());
+        commandBuffers->LoadDraw(vbo, ibo);
+
+        commandBuffers->CloseCommandBuffers();
+    }
+
+    void VulkanContext::PrepareFrame()
+    {
+        vkWaitForFences(*device->GetLogicalDevice(), 1, &(*semaphores->GetInFlightFences())[currentFrame], VK_TRUE, UINT64_MAX);
+        VkResult result = vkAcquireNextImageKHR(
+            *device->GetLogicalDevice(),
+            *swapChain->GetSwapChain(),
+            UINT64_MAX,
+            (*semaphores->GetImageAvailableSemaphores())[currentFrame],
+            VK_NULL_HANDLE, &imageIndex
+        );
+        if (result == VK_SUCCESS)
+        {
+            return;
+        }
+        if ((result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR)) 
+        {
+		    RecreateSwapChain();
+	    }
+	    else 
+        {
+            ES_CORE_ASSERT("Cant aquire next image");
+	    }
+    }
+
+    void VulkanContext::SubmitFrame()
+    {
+        if ((*semaphores->GetImagesInFlight())[imageIndex] != VK_NULL_HANDLE) {
+            vkWaitForFences(*device->GetLogicalDevice(), 1, &(*semaphores->GetInFlightFences())[currentFrame], VK_TRUE, UINT64_MAX);
+        }
+        (*semaphores->GetImagesInFlight())[imageIndex] = (*semaphores->GetInFlightFences())[currentFrame];
+
+        VkSubmitInfo submitInfo = {};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {(*semaphores->GetImageAvailableSemaphores())[currentFrame]};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &(*commandBuffers->GetCommandBuffersVector())[imageIndex];
+
+        VkSemaphore signalSemaphores[] = {(*semaphores->GetRenderFinishedSemaphores())[currentFrame]};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        vkResetFences(*device->GetLogicalDevice(), 1, &(*semaphores->GetInFlightFences())[currentFrame]);
+
+        if (vkQueueSubmit(*device->GetGraphicsQueue(), 1, &submitInfo, (*semaphores->GetInFlightFences())[currentFrame]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to submit draw command buffer!");
+        }
+
+        VkPresentInfoKHR presentInfo = {};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {*swapChain->GetSwapChain()};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+
+        presentInfo.pImageIndices = &imageIndex;
+
+        VkResult result = vkQueuePresentKHR(*device->GetPresentQueue(), &presentInfo);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+            framebufferResized = false;
+            RecreateSwapChain();
+        } else if (result != VK_SUCCESS) {
+            throw std::runtime_error("failed to present swap chain image!");
+        }
+
+        currentFrame = (currentFrame + 1) % maxFramesInFlight;   
+    }
+
+    void VulkanContext::ResizeFramebuffers()
+    {
+        framebufferResized = true;
+    }
+
+    void VulkanContext::FreeComandBuffers()
+    {
+        commandBuffers->FreeCommandBuffers();
+    }
+
+    void VulkanContext::EndDraw()
+    {
+        vkDeviceWaitIdle(*device->GetLogicalDevice());
+    }
+
 /*
     void VulkanContext::SwapBuffers()
     {

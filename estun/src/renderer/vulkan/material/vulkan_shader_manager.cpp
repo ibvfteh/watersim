@@ -9,7 +9,7 @@ namespace estun
 
     ShaderManager* ShaderManager::GetInstance()
     {
-        if (instance = nullptr)
+        if (instance == nullptr)
         {
             instance = new ShaderManager();
         }

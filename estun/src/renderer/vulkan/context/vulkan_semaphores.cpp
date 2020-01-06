@@ -5,12 +5,13 @@
 
 namespace estun
 {
-    VulkanSemaphoresManager::VulkanSemaphoresManager(const uint32_t imageCount_t)
+    VulkanSemaphoresManager::VulkanSemaphoresManager(const uint32_t imageCount_t, const uint32_t swapChainImagesSize)
         : imageCount(imageCount_t)
     {
         imageAvailableSemaphores.resize(imageCount);
         renderFinishedSemaphores.resize(imageCount);
         inFlightFences.resize(imageCount);
+        imagesInFlight.resize(swapChainImagesSize, VK_NULL_HANDLE);
 
         VkSemaphoreCreateInfo semaphoreInfo = {};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -53,5 +54,10 @@ namespace estun
     const std::vector<VkFence>* VulkanSemaphoresManager::GetInFlightFences() const
     {
         return &inFlightFences;
+    }
+    
+    std::vector<VkFence>* VulkanSemaphoresManager::GetImagesInFlight() 
+    {
+        return &imagesInFlight;
     }
 }

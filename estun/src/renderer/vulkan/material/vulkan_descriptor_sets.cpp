@@ -42,11 +42,6 @@ namespace estun
 	    return &descriptorSetLayout;
     }
 
-    VkPipelineLayout* VulkanDescriptorSets::GetPipelineLayout()
-    {
-	    return &pipelineLayout;
-    }
-
     const std::vector<VkDescriptorSet>* VulkanDescriptorSets::GetDescriptorSets() const
     {
     	return &descriptorSets;

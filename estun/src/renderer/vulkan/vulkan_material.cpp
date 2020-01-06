@@ -19,7 +19,7 @@ namespace estun
 
     void VulkanMaterial::CreatePipeline(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
     {
-        pipeline = VulkanMaterialPoolLocator::GetPipeline(vertexShaderPath, fragmentShaderPath, descriptorSets->GetDescriptorSetLayout());
+        pipeline = VulkanMaterialPoolLocator::GetPipeline(vertexShaderPath, fragmentShaderPath, descriptorSets);
     }
 
     void VulkanMaterial::CreateTexture(const std::string& texturePath)

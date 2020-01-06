@@ -21,6 +21,10 @@
 #include "renderer/vulkan/swap_chain/vulkan_resources.h"
 #include "renderer/vulkan/swap_chain/vulkan_swap_chain.h"
 
+
+#include "renderer/vulkan/vulkan_material.h"
+#include "renderer/vulkan/material/vulkan_material_pool.h"
+
 namespace estun 
 {
     struct GameInfo
@@ -42,16 +46,23 @@ namespace estun
 	class VulkanContext 
 	{
 	public:
-		VulkanContext(GLFWwindow* windowHandle, GameInfo* gameInfo);
+		VulkanContext(GLFWwindow* windowHandle, GameInfo* appGameInfo);
         ~VulkanContext();
 
 		void SwapBuffers();
+        void Submit(VulkanVertexBuffer* vbo, VulkanIndexBuffer* ibo, VulkanMaterial* material);
+        void PrepareFrame();
+        void SubmitFrame();
+        void ResizeFramebuffers();
+        void FreeComandBuffers();
+        void EndDraw();
 
         VulkanRenderPass* GetRenderPass() { return renderPass; }
         VulkanCommandPool* GetCommandPool() { return commandPool; }
         VulkanImageView* GetImageView() { return imageView; }
         VulkanSwapChain* GetSwapChain() { return swapChain; }
 		VkPolygonMode GetPolygonMode() { return polygonMode; }
+        uint32_t GetCurrentImage() { return imageIndex; }
 	private:
 		void Init(GLFWwindow* windowHandle);
         void Shutdown();
@@ -76,6 +87,12 @@ namespace estun
         VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
 
         GameInfo* gameInfo;
+
+        uint32_t imageIndex;
+        uint32_t currentFrame;
+        uint32_t maxFramesInFlight = 2;
+
+        bool framebufferResized = false;
     };
 
     class VulkanContextLocator
@@ -83,15 +100,15 @@ namespace estun
     public:
         static VulkanContext* GetContext() 
         { 
-            if (context == nullptr) 
+            if (currContext == nullptr) 
             {
                 ES_CORE_ASSERT("Failed to request vulkan context");
             } 
-            return context; 
+            return currContext; 
         }
 
-        static void Provide(VulkanContext* context) { context = context; } 
+        static void Provide(VulkanContext* context) { currContext = context; } 
     private:
-        static VulkanContext* context;
+        static VulkanContext* currContext;
     };
 }

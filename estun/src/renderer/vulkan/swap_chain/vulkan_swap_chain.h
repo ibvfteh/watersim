@@ -13,7 +13,7 @@ namespace estun
     public:
     private:
         VkSwapchainKHR                 swapChain;
-        std::vector<VkImage>     swapChainImages;
+        std::vector<VkImage>           swapChainImages;
         VkFormat                       swapChainImageFormat;
         VkExtent2D                     swapChainExtent;
         uint32_t                       imageCount = -1;

@@ -11,7 +11,6 @@ namespace estun
 	{
 	private:
 		VkDescriptorSetLayout descriptorSetLayout;
-		VkPipelineLayout pipelineLayout;
 		std::vector<VkDescriptorSet> descriptorSets;
 
 	public:
@@ -24,7 +23,6 @@ namespace estun
 			                      const VkDeviceSize& bufferInfoSize = sizeof(UniformBufferObject));
 
 		VkDescriptorSetLayout*              GetDescriptorSetLayout();
-		VkPipelineLayout*                   GetPipelineLayout();
 		const std::vector<VkDescriptorSet>* GetDescriptorSets() const;
 	};
 }

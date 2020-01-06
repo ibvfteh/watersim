@@ -10,6 +10,7 @@
 
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <memory>
 
 namespace estun
 {
@@ -28,10 +29,10 @@ namespace estun
             VkExtent2D* swapChainExtent, 
             VulkanFramebuffers* vkSwapChainFramebuffers);
         void CloseCommandBuffers();
-        //void ResetCommandBuffers();
+        void ResetCommandBuffers();
         void FreeCommandBuffers();
 
-        void BindShader(VulkanGraphicsPipeline* graphicsPipeline, VulkanDescriptorSets* descriptorSets);
+        void BindShader(std::shared_ptr<VulkanGraphicsPipeline> graphicsPipeline, VulkanDescriptorSets* descriptorSets);
         void LoadDraw(VulkanVertexBuffer* vertexBuffer, VulkanIndexBuffer* indexBuffer);
 
         std::vector<VkCommandBuffer>* GetCommandBuffersVector();

@@ -1,13 +1,11 @@
 #include "renderer/vulkan/material/vulkan_material_pool.h"
 
+#include <iostream>
+#include <sstream>
+
 namespace estun
 {
-    VulkanMaterialPool* VulkanMaterialPoolLocator::pool = nullptr;
-
-    VulkanMaterialPool::VulkanMaterialPool()
-    {
-
-    }
+    VulkanMaterialPool* VulkanMaterialPoolLocator::currPool = nullptr;
 
     VulkanMaterialPool::~VulkanMaterialPool()
     {
@@ -47,34 +45,33 @@ namespace estun
     	}
     }
 		
-	void VulkanMaterialPool::RebuildPipelines()
+	void VulkanMaterialPool::RebuildPipelines() 
     {
-/*
+
         for (const auto& pipeline : pipelinePool)
         {
-            delete pipeline.second;
-            vertexShaderPath = 
-            fragmentShaderPath = 
-            pipeline.second = std::make_shared<VulkanGraphicsPipeline>(
-			    vertexShaderPath,
-		    	fragmentShaderPath,
-			    descriptorSetLayout);
+            std::istringstream iss(pipeline.first);
+			std::string vertexShaderPath;
+			std::string fragmentShaderPath;
+            VulkanDescriptorSets* vds = pipeline.second->GetDescriptorSets();
+            iss >> vertexShaderPath >> fragmentShaderPath;
+            pipelinePool[pipeline.first].reset(new VulkanGraphicsPipeline(vertexShaderPath, fragmentShaderPath, vds));
         }
-*/
+
     }
 
     std::shared_ptr<VulkanGraphicsPipeline> VulkanMaterialPool::GetPipeline(
 				const std::string& vertexShaderPath,
 				const std::string& fragmentShaderPath,
-				VkDescriptorSetLayout* descriptorSetLayout)
+				VulkanDescriptorSets* descriptorSets)
     {
-        const std::string keyString = vertexShaderPath + "|" + fragmentShaderPath;
-	    if (pipelinePool.find(keyString) == pipelinePool.end())
+        const std::string keyString = vertexShaderPath + " " + fragmentShaderPath;
+        if (pipelinePool.find(keyString) == pipelinePool.end())
 	    {
 	    	pipelinePool[keyString] = std::make_shared<VulkanGraphicsPipeline>(
 			    vertexShaderPath,
 		    	fragmentShaderPath,
-			    descriptorSetLayout);
+			    descriptorSets);
 		    ES_CORE_INFO("Pipeline loaded and created");
 	    }
 	    return pipelinePool[keyString];
@@ -96,7 +93,7 @@ namespace estun
        {
            const std::shared_ptr<VulkanTextureImage> textureImage = GetTextureImage(texturePath);
            textureSamplerPool[texturePath] = std::make_shared<VulkanTextureSampler>(textureImage->GetMipLevels());
-           ES_CORE_INFO("Texture image view loaded and created");
+           ES_CORE_INFO("Texture image sampler loaded and created");
        }
        return textureSamplerPool[texturePath];
     }

@@ -36,8 +36,9 @@ namespace estun
         }
     }
 
-    void VulkanUniformBuffer::Update(UniformBufferObject& newUbo, uint32_t& currentImage)
+    void VulkanUniformBuffer::Update(UniformBufferObject& newUbo)
     {
+        uint32_t currentImage = VulkanContextLocator::GetContext()->GetCurrentImage();
         ubo = newUbo;
         std::memcpy(mappedMemory[currentImage], &ubo, sizeof(ubo));
     }

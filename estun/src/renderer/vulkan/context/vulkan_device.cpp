@@ -77,6 +77,9 @@ namespace estun
     
         bool extensionsSupported = CheckDeviceExtensionSupport(device);
         
+        VkPhysicalDeviceFeatures supportedFeatures;
+        vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+
         bool swapChainAdequate = false;
         if (extensionsSupported) 
         {
@@ -86,7 +89,7 @@ namespace estun
 
         if (deviceId == curr_deviceId)
         {
-            return indices.isComplete() && extensionsSupported && swapChainAdequate;
+            return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
         }
 
         return false;
@@ -170,6 +173,7 @@ namespace estun
         }
 
         VkPhysicalDeviceFeatures deviceFeatures = {};
+        deviceFeatures.samplerAnisotropy = VK_TRUE;
 
         VkDeviceCreateInfo createInfo = {};
         createInfo.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

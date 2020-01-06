@@ -6,6 +6,7 @@
 #include "renderer/vulkan/material/vulkan_texture_image.h"
 #include "renderer/vulkan/material/vulkan_texture_image_view.h"
 #include "renderer/vulkan/material/vulkan_texture_sampler.h"
+#include "renderer/vulkan/material/vulkan_descriptor_sets.h"
 #include "renderer/vulkan/material/vulkan_pipeline.h"
 
 #include <memory>
@@ -24,13 +25,13 @@ namespace estun
 
         std::unordered_map<std::string, std::shared_ptr<VulkanGraphicsPipeline>> pipelinePool;
     public:
-        VulkanMaterialPool();
+        VulkanMaterialPool() = default;
 		~VulkanMaterialPool();
 
         std::shared_ptr<VulkanGraphicsPipeline> GetPipeline(
 				const std::string& vertexShaderPath,
 				const std::string& fragmentShaderPath,
-				VkDescriptorSetLayout* descriptorSetLayout);
+				VulkanDescriptorSets* descriptorSets);
 
 		std::shared_ptr<VulkanTextureImage>     GetTextureImage(const std::string& texturePath);
 		std::shared_ptr<VulkanTextureSampler>   GetTextureSampler(const std::string& texturePath);
@@ -43,18 +44,19 @@ namespace estun
     class VulkanMaterialPoolLocator
     {
     private:
-        static VulkanMaterialPool* pool;
+        static VulkanMaterialPool* currPool;
     public:
-        static void Provide(VulkanMaterialPool* pool) { pool = pool; };
+        static void Provide(VulkanMaterialPool* pool) { currPool = pool; };
 
         static std::shared_ptr<VulkanGraphicsPipeline> GetPipeline(
 			const std::string& vertexShaderPath,
 			const std::string& fragmentShaderPath,
-			VkDescriptorSetLayout* descriptorSetLayout)
-        { return pool->GetPipeline(vertexShaderPath, fragmentShaderPath, descriptorSetLayout); };
+			VulkanDescriptorSets* descriptorSets)
+        { return currPool->GetPipeline(vertexShaderPath, fragmentShaderPath, descriptorSets); };
 
-		static std::shared_ptr<VulkanTextureImage>     GetTextureImage(const std::string& texturePath) { return pool->GetTextureImage(texturePath); };
-		static std::shared_ptr<VulkanTextureSampler>   GetTextureSampler(const std::string& texturePath) { return pool->GetTextureSampler(texturePath); };
-		static std::shared_ptr<VulkanTextureImageView> GetTextureImageView(const std::string& texturePath) { return pool->GetTextureImageView(texturePath); };
+		static std::shared_ptr<VulkanTextureImage>     GetTextureImage(const std::string& texturePath) { return currPool->GetTextureImage(texturePath); };
+		static std::shared_ptr<VulkanTextureSampler>   GetTextureSampler(const std::string& texturePath) { return currPool->GetTextureSampler(texturePath); };
+		static std::shared_ptr<VulkanTextureImageView> GetTextureImageView(const std::string& texturePath) { return currPool->GetTextureImageView(texturePath); };
+		static void RebuildPipelines() { return currPool->RebuildPipelines(); };
     };
 }

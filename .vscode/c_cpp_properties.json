@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}",
+                "${workspaceFolder}/estun/src",
+                "${workspaceFolder}/estun/dependencies/glfw/include",
+                "${workspaceFolder}/estun/dependencies/glm",
+                "${workspaceFolder}/estun/dependencies/spdlog/include",
+                "${workspaceFolder}/estun/dependencies/stbi",
+                "${workspaceFolder}/estun/dependencies/tinyobjloader"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x86",
+            "configurationProvider": "vector-of-bool.cmake-tools"
+        }
+    ],
+    "version": 4
+}
