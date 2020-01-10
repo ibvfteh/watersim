@@ -12,6 +12,8 @@
 #include <vector>
 #include <memory>
 
+#define WORKGROUP_SIZE 1
+
 namespace estun
 {
     class VulkanCommandBuffers
@@ -28,12 +30,16 @@ namespace estun
             VulkanRenderPass* renderPass, 
             VkExtent2D* swapChainExtent, 
             VulkanFramebuffers* vkSwapChainFramebuffers);
+        void BeginCommandBuffers();
+        void EndCommandBuffers();
         void CloseCommandBuffers();
         void ResetCommandBuffers();
         void FreeCommandBuffers();
 
         void BindShader(std::shared_ptr<VulkanGraphicsPipeline> graphicsPipeline, VulkanDescriptorSets* descriptorSets);
+        void BindShader(std::shared_ptr<VulkanComputePipeline> computePipeline, VulkanDescriptorSets* descriptorSets);
         void LoadDraw(VulkanVertexBuffer* vertexBuffer, VulkanIndexBuffer* indexBuffer);
+        void LoadCompute(uint32_t x, uint32_t y);
 
         std::vector<VkCommandBuffer>* GetCommandBuffersVector();
     };

@@ -5,7 +5,7 @@ namespace estun
 {
     VulkanVertexBuffer::VulkanVertexBuffer(std::vector<Vertex>* vertices)
     {
-        VkDeviceSize bufferSize = sizeof((*vertices)[0]) * vertices->size();
+        bufferSize = sizeof((*vertices)[0]) * vertices->size();
 
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingBufferMemory;
@@ -16,7 +16,7 @@ namespace estun
         memcpy(data, vertices->data(), (size_t)bufferSize);
         vkUnmapMemory(*VulkanDeviceLocator::GetLogicalDevice(), stagingBufferMemory);
 
-        VulkanBufferManager::CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
+        VulkanBufferManager::CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
 
         VulkanBufferManager::CopyBuffer(&stagingBuffer, vertexBuffer, bufferSize);
 
@@ -33,5 +33,10 @@ namespace estun
     VkBuffer* VulkanVertexBuffer::GetBuffer()
     {
         return &vertexBuffer;
+    }
+
+    VkDeviceSize VulkanVertexBuffer::GetSize()
+    {
+        return bufferSize;
     }
 }

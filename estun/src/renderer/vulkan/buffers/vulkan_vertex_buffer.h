@@ -13,9 +13,9 @@ namespace estun
     class Vertex
     {
     public:
-        glm::vec3 pos;
-        glm::vec3 color;
-        glm::vec2 texCoord;
+        glm::vec4 pos;
+        glm::vec4 color;
+        glm::vec4 texCoord;
         
     public:
         static VkVertexInputBindingDescription GetBindingDescription()
@@ -59,6 +59,7 @@ namespace estun
     class VulkanVertexBuffer
     {
     private:
+        VkDeviceSize bufferSize;
         VkBuffer vertexBuffer;
         VkDeviceMemory vertexBufferMemory;
     public:
@@ -66,6 +67,7 @@ namespace estun
         ~VulkanVertexBuffer();
 
         VkBuffer* GetBuffer();
+        VkDeviceSize GetSize();
     };
 }
 

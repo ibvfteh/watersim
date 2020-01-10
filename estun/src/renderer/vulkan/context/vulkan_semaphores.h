@@ -10,6 +10,8 @@ namespace estun
     private:
         std::vector<VkSemaphore> imageAvailableSemaphores;
         std::vector<VkSemaphore> renderFinishedSemaphores;
+        VkSemaphore computeAvailableSemaphores;
+        VkSemaphore computeFinishedSemaphores;
         std::vector<VkFence> inFlightFences;
         std::vector<VkFence> imagesInFlight;
 
@@ -20,6 +22,8 @@ namespace estun
 
         const std::vector<VkSemaphore>* GetImageAvailableSemaphores() const;
         const std::vector<VkSemaphore>* GetRenderFinishedSemaphores() const;
+        VkSemaphore* GetComputeAvailableSemaphores();
+        VkSemaphore* GetComputeFinishedSemaphores();
         const std::vector<VkFence>* GetInFlightFences() const;
         std::vector<VkFence>* GetImagesInFlight();
     };

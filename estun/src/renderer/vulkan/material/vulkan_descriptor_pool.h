@@ -2,6 +2,8 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <vector>
+
 namespace estun
 {
 	class VulkanDescriptorPool
@@ -10,8 +12,13 @@ namespace estun
 		VkDescriptorPool descriptorPool;
 
 	public:
-		VulkanDescriptorPool();
+		VulkanDescriptorPool(std::vector<VkDescriptorPoolSize> poolSizes);
 		~VulkanDescriptorPool();
+
+    	static VkDescriptorPoolSize Descriptor(VkDescriptorType type, uint32_t count);
+    	static VkDescriptorPoolSize UniformDescriptor();
+    	static VkDescriptorPoolSize ImageDescriptor();
+    	static VkDescriptorPoolSize StorageDescriptor();
 
 		VkDescriptorPool* GetDescriptorPool();
 	};

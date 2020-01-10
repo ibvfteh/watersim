@@ -86,6 +86,7 @@ namespace estun
 
     VkPresentModeKHR VulkanSwapChain::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
     {
+        /*
         for (const auto& availablePresentMode : availablePresentModes) 
         {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
@@ -93,6 +94,7 @@ namespace estun
                 return availablePresentMode;
             }
         }
+        */
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 

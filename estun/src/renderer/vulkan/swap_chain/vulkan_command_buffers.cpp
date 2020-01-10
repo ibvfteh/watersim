@@ -58,6 +58,17 @@ namespace estun
         }
     }
 
+     void VulkanCommandBuffers::BeginCommandBuffers()
+    {
+        VkCommandBufferBeginInfo beginInfo = {};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        if (vkBeginCommandBuffer(commandBuffers[0], &beginInfo) != VK_SUCCESS) 
+        {
+            ES_CORE_ASSERT("Failed to begin recording command buffer");
+        }
+    }
+
     void VulkanCommandBuffers::BindShader(std::shared_ptr<VulkanGraphicsPipeline> graphicsPipeline, VulkanDescriptorSets* descriptorSets)
     {
         for (int i = 0; i < commandBuffers.size(); i++) 
@@ -74,6 +85,19 @@ namespace estun
         }
     }
 
+    void VulkanCommandBuffers::BindShader(std::shared_ptr<VulkanComputePipeline> computePipeline, VulkanDescriptorSets* descriptorSets)
+    {
+        vkCmdBindPipeline(commandBuffers[0], VK_PIPELINE_BIND_POINT_COMPUTE, *computePipeline->GetComputePipeline());
+
+        vkCmdBindDescriptorSets(
+                commandBuffers[0],
+                VK_PIPELINE_BIND_POINT_COMPUTE,
+                *computePipeline->GetPipelineLayout(),
+                0, 1,
+                &(*descriptorSets->GetDescriptorSets())[0],
+                0, nullptr);
+    }
+
     void VulkanCommandBuffers::LoadDraw(VulkanVertexBuffer* vertexBuffer, VulkanIndexBuffer* indexBuffer)
     {
         for (auto& commandBuffer : commandBuffers) 
@@ -85,6 +109,20 @@ namespace estun
             vkCmdBindIndexBuffer(commandBuffer, *indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
             vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indexBuffer->GetSize()), 1, 0, 0, 0);
+        }
+    }
+
+
+    void VulkanCommandBuffers::LoadCompute(uint32_t x, uint32_t y)
+    {
+		vkCmdDispatch(commandBuffers[0], x / WORKGROUP_SIZE, y / WORKGROUP_SIZE, 1);
+    }
+
+    void VulkanCommandBuffers::EndCommandBuffers()
+    {
+        if (vkEndCommandBuffer(commandBuffers[0]) != VK_SUCCESS)
+        {
+            ES_CORE_ASSERT("Failed to record command buffer");
         }
     }
 

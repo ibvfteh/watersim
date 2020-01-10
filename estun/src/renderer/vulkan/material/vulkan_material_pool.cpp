@@ -53,9 +53,8 @@ namespace estun
             std::istringstream iss(pipeline.first);
 			std::string vertexShaderPath;
 			std::string fragmentShaderPath;
-            VulkanDescriptorSets* vds = pipeline.second->GetDescriptorSets();
             iss >> vertexShaderPath >> fragmentShaderPath;
-            pipelinePool[pipeline.first].reset(new VulkanGraphicsPipeline(vertexShaderPath, fragmentShaderPath, vds));
+            pipeline.second->RebuildPipeline(vertexShaderPath, fragmentShaderPath);
         }
 
     }

@@ -1,0 +1,75 @@
+#version 450
+
+struct Vertex {
+    vec4 pos;
+    vec4 color;
+    vec4 texCoord;
+};
+
+layout(std430, binding = 0) buffer VretexA {
+	Vertex vretexA[ ];
+};
+
+layout(std430, binding = 1) buffer VretexB {
+	Vertex vretexB[ ];
+};
+
+layout(std430, binding = 2) buffer VretexC {
+	Vertex vretexC[ ];
+};
+
+//layout (local_size_x = 10, local_size_y = 10) in;
+int x = 101;
+int y = 101;
+
+
+void main() 
+{
+	uvec3 id = gl_GlobalInvocationID; 
+    float w = 1.985;
+	uint index = id.y * x + id.x;
+    float sum = 0;
+    float count = 0;
+    if(id.x == 0 || id.y == 0 || id.x == x-1 || id.y == y-1) {
+        vretexA[index].pos.y = 0.0;
+        return;
+    }
+	if (id.x > 0) {
+        sum += vretexB[index - 1].pos.y;
+        count += 1.0;
+    }
+	if (id.x < x - 1) {
+        sum += vretexB[index + 1].pos.y;
+        count += 1.0;
+    }
+	if (id.y > 0) {
+	    uint index2 = (id.y - 1) * x + id.x;
+        sum += vretexB[index2].pos.y;
+        count += 1.0;
+    }
+	if (id.y < y - 1) {
+	    uint index2 = (id.y + 1) * x + id.x;
+        sum += vretexB[index2].pos.y;
+        count += 1.0;
+    }
+
+	if (id.x > x) {
+        return;
+    }
+	if (id.x < 0) {
+        return;
+    }
+	if (id.y > y) {
+        return;
+    }
+	if (id.y < 0) {
+        return;
+    }
+    //vretexC[index].color = vec4(vec3(count / 4.0), 1.0f);
+    //vretexC[index].pos.x = 1.0f;
+    //vretexC[index].pos.z = 1.0f;
+    //vretexC[index].pos.w = 1.0f;
+    //vretexC[index].texCoord.x = 1.0f;
+    //vretexC[index].texCoord.y = 1.0f;
+    vretexC[index].pos.y = (1-w) * vretexA[index].pos.y + w * sum / count;
+}

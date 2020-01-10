@@ -12,6 +12,23 @@ namespace estun
                 )
     {
         descriptorSets = shaderDescriptorSets;
+        Init(vertexShaderName, fragmentShaderName);
+    }
+
+    void VulkanGraphicsPipeline::RebuildPipeline(
+                const std::string vertexShaderName,
+                const std::string fragmentShaderName
+                )
+    {
+        Delete();
+        Init(vertexShaderName, fragmentShaderName);
+    }
+
+    void VulkanGraphicsPipeline::Init(
+                const std::string vertexShaderName,
+                const std::string fragmentShaderName
+                )
+    {
         VkShaderModule vertShaderModule = ShaderManager::GetInstance()->GetShaderModule(vertexShaderName);
         VkShaderModule fragShaderModule = ShaderManager::GetInstance()->GetShaderModule(fragmentShaderName);
 
@@ -49,9 +66,9 @@ namespace estun
 
         VkViewport viewport = {};
         viewport.x        = 0.0f;
-        viewport.y        = 0.0f;
+        viewport.y        = (float) swapChainExtent->height;
         viewport.width    = (float) swapChainExtent->width;
-        viewport.height   = (float) swapChainExtent->height;
+	    viewport.height   = -(float) swapChainExtent->height;
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
         ES_CORE_INFO(swapChainExtent->width);
@@ -142,6 +159,11 @@ namespace estun
 
     VulkanGraphicsPipeline::~VulkanGraphicsPipeline()
     {
+        Delete();
+    }
+
+    void VulkanGraphicsPipeline::Delete()
+    {
         vkDestroyPipelineLayout(*VulkanDeviceLocator::GetLogicalDevice(), pipelineLayout, nullptr);
         vkDestroyPipeline(*VulkanDeviceLocator::GetLogicalDevice(), graphicsPipeline, nullptr);
     }
@@ -157,6 +179,74 @@ namespace estun
     }
 
     VulkanDescriptorSets* VulkanGraphicsPipeline::GetDescriptorSets()
+    {
+        return descriptorSets;
+    }
+
+    VulkanComputePipeline::VulkanComputePipeline(
+                const std::string computeShaderName,
+                VulkanDescriptorSets* shaderDescriptorSets
+                )
+    {
+        descriptorSets = shaderDescriptorSets;
+        VkShaderModule computeShaderModule = ShaderManager::GetInstance()->GetShaderModule(computeShaderName);
+
+        VkExtent2D* swapChainExtent = VulkanContextLocator::GetContext()->GetSwapChain()->GetSwapChainExtent();
+      
+        VkPipelineShaderStageCreateInfo shaderStageCreateInfo = {};
+        shaderStageCreateInfo.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shaderStageCreateInfo.stage  = VK_SHADER_STAGE_COMPUTE_BIT;
+        shaderStageCreateInfo.module = computeShaderModule;
+        shaderStageCreateInfo.pName  = "main";
+
+        //VkPushConstantRange pcRange = {};   
+        //pcRange.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+        //pcRange.offset     = 0;
+        //pcRange.size       = 2*sizeof(int);  
+
+        VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
+        pipelineLayoutCreateInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutCreateInfo.setLayoutCount         = 1;
+        pipelineLayoutCreateInfo.pSetLayouts            = descriptorSets->GetDescriptorSetLayout();
+        //pipelineLayoutCreateInfo.pushConstantRangeCount = 1;
+        //pipelineLayoutCreateInfo.pPushConstantRanges    = &pcRange;
+        
+        if (vkCreatePipelineLayout(*VulkanDeviceLocator::GetLogicalDevice(), &pipelineLayoutCreateInfo, NULL, &pipelineLayout)!= VK_SUCCESS) 
+        {
+            ES_CORE_ASSERT("Failed to create pipeline layout");
+        }
+
+        VkComputePipelineCreateInfo pipelineCreateInfo = {};
+        pipelineCreateInfo.sType  = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+        pipelineCreateInfo.stage  = shaderStageCreateInfo;
+        pipelineCreateInfo.layout = pipelineLayout;
+
+        if (vkCreateComputePipelines(*VulkanDeviceLocator::GetLogicalDevice(), VK_NULL_HANDLE, 1, &pipelineCreateInfo, NULL, &computePipeline)!= VK_SUCCESS) 
+        {
+            ES_CORE_ASSERT("Failed to create compute pipeline");
+        }
+    
+        //vkDestroyShaderModule(*VulkanDeviceLocator::GetLogicalDevice(), fragShaderModule, nullptr);
+        //vkDestroyShaderModule(*VulkanDeviceLocator::GetLogicalDevice(), vertShaderModule, nullptr);
+    }
+
+    VulkanComputePipeline::~VulkanComputePipeline()
+    {
+        vkDestroyPipelineLayout(*VulkanDeviceLocator::GetLogicalDevice(), pipelineLayout, nullptr);
+        vkDestroyPipeline(*VulkanDeviceLocator::GetLogicalDevice(), computePipeline, nullptr);
+    }
+
+    VkPipeline* VulkanComputePipeline::GetComputePipeline()
+    {
+        return &computePipeline;
+    }
+
+    VkPipelineLayout* VulkanComputePipeline::GetPipelineLayout()
+    {
+        return &pipelineLayout;
+    }
+
+    VulkanDescriptorSets* VulkanComputePipeline::GetDescriptorSets()
     {
         return descriptorSets;
     }

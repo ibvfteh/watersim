@@ -57,6 +57,9 @@ namespace estun
         void FreeComandBuffers();
         void EndDraw();
 
+        void SubmitCompute(uint32_t x, uint32_t y, VulkanMaterial* material);
+        void StartCompute();
+
         VulkanRenderPass* GetRenderPass() { return renderPass; }
         VulkanCommandPool* GetCommandPool() { return commandPool; }
         VulkanImageView* GetImageView() { return imageView; }
@@ -93,6 +96,7 @@ namespace estun
         uint32_t maxFramesInFlight = 2;
 
         bool framebufferResized = false;
+        bool firstCompute = true;
     };
 
     class VulkanContextLocator

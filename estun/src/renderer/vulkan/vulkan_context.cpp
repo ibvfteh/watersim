@@ -107,12 +107,58 @@ namespace estun {
     {
         vkDeviceWaitIdle(*device->GetLogicalDevice());
 
+        //commandBuffers->ResetCommandBuffers();
         commandBuffers->InitCommandBuffers(renderPass, swapChain->GetSwapChainExtent(), framebuffers);
 
         commandBuffers->BindShader(material->GetPipeline(), material->GetDescriptorSets());
         commandBuffers->LoadDraw(vbo, ibo);
 
         commandBuffers->CloseCommandBuffers();
+    }
+
+
+    void VulkanContext::SubmitCompute(uint32_t x, uint32_t y, VulkanMaterial* material)
+    {
+        vkDeviceWaitIdle(*device->GetLogicalDevice());
+
+        //commandBuffers->ResetCommandBuffers();
+        commandBuffers->BeginCommandBuffers();
+
+        commandBuffers->BindShader(material->GetComputePipeline(), material->GetComputeDescriptorSets());
+        commandBuffers->LoadCompute(x, y);
+
+        commandBuffers->EndCommandBuffers();
+    }
+
+    void VulkanContext::StartCompute()
+    {
+		VkSubmitInfo submitInfo = {};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        
+		VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT};
+
+        //VkSemaphore waitSemaphores[] = {(*semaphores->GetComputeAvailableSemaphores())};
+        VkSemaphore waitSemaphores[] = {(*semaphores->GetImageAvailableSemaphores())[currentFrame]};
+
+		if (!firstCompute) {
+            submitInfo.waitSemaphoreCount = 1;
+            submitInfo.pWaitSemaphores = waitSemaphores;
+            submitInfo.pWaitDstStageMask = waitStages;
+		} else {
+			firstCompute = false;
+		}
+
+		submitInfo.signalSemaphoreCount = 1;
+        VkSemaphore signalSemaphores[] = {(*semaphores->GetComputeFinishedSemaphores())};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &(*commandBuffers->GetCommandBuffersVector())[0];
+
+        if (vkQueueSubmit(*device->GetComputeQueue(), 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) 
+        {
+            ES_CORE_ASSERT("Failed to submit compute command buffer");
+        }
     }
 
     void VulkanContext::PrepareFrame()
@@ -149,7 +195,8 @@ namespace estun {
         VkSubmitInfo submitInfo = {};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = {(*semaphores->GetImageAvailableSemaphores())[currentFrame]};
+        //VkSemaphore waitSemaphores[] = {(*semaphores->GetImageAvailableSemaphores())[currentFrame]};
+        VkSemaphore waitSemaphores[] = {(*semaphores->GetComputeFinishedSemaphores())};
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
@@ -164,8 +211,9 @@ namespace estun {
 
         vkResetFences(*device->GetLogicalDevice(), 1, &(*semaphores->GetInFlightFences())[currentFrame]);
 
-        if (vkQueueSubmit(*device->GetGraphicsQueue(), 1, &submitInfo, (*semaphores->GetInFlightFences())[currentFrame]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to submit draw command buffer!");
+        if (vkQueueSubmit(*device->GetGraphicsQueue(), 1, &submitInfo, (*semaphores->GetInFlightFences())[currentFrame]) != VK_SUCCESS) 
+        {
+            ES_CORE_ASSERT("Failed to submit draw command buffer");
         }
 
         VkPresentInfoKHR presentInfo = {};
@@ -182,11 +230,14 @@ namespace estun {
 
         VkResult result = vkQueuePresentKHR(*device->GetPresentQueue(), &presentInfo);
 
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) 
+        {
             framebufferResized = false;
             RecreateSwapChain();
-        } else if (result != VK_SUCCESS) {
-            throw std::runtime_error("failed to present swap chain image!");
+        } 
+        else if (result != VK_SUCCESS) 
+        {
+            ES_CORE_ASSERT("Failed to present swap chain image");
         }
 
         currentFrame = (currentFrame + 1) % maxFramesInFlight;   

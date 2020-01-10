@@ -30,9 +30,11 @@ namespace estun
 
         int i = 0;
         for (const auto& queueFamily : queueFamilies) {
-            if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) 
+
+            if (queueFamily.queueFlags & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT)) 
             {
                 indices.graphicsFamily = i;
+                indices.computeFamily = i;
             }
 
             VkBool32 presentSupport = false;
@@ -160,7 +162,7 @@ namespace estun
         currIndices = FindQueueFamilies(physicalDevice, *surface->GetSurface());
 
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-        std::set<uint32_t> uniqueQueueFamilies = {currIndices.graphicsFamily.value(), currIndices.presentFamily.value()};
+        std::set<uint32_t> uniqueQueueFamilies = {currIndices.graphicsFamily.value(), currIndices.presentFamily.value(), currIndices.computeFamily.value()};
         float queuePriority = 1.0f;
         for (uint32_t queueFamily : uniqueQueueFamilies) 
         {
@@ -200,7 +202,8 @@ namespace estun
         }
 
         vkGetDeviceQueue(logicalDevice, currIndices.graphicsFamily.value(), 0, &graphicsQueue);
-        vkGetDeviceQueue(logicalDevice, currIndices.presentFamily.value(), 0, &presentQueue);    
+        vkGetDeviceQueue(logicalDevice, currIndices.presentFamily.value(), 0, &presentQueue);  
+        vkGetDeviceQueue(logicalDevice, currIndices.computeFamily.value(), 0, &computeQueue);  
     }
 
     
@@ -232,6 +235,11 @@ namespace estun
     VkQueue* VulkanDevice::GetPresentQueue() 
     {
         return &presentQueue;
+    }
+
+    VkQueue* VulkanDevice::GetComputeQueue()
+    {
+        return &computeQueue;
     }
 
     SwapChainSupportDetails VulkanDevice::QuerySwapChainSupport(VkPhysicalDevice device, VulkanSurface* surface)

@@ -23,7 +23,37 @@ namespace estun
                 );
         ~VulkanGraphicsPipeline();
 
+        void Init(
+                const std::string vertexShaderName,
+                const std::string fragmentShaderName
+                );
+        void RebuildPipeline(
+                const std::string vertexShaderName,
+                const std::string fragmentShaderName
+                );
+
+        void Delete();
+
         VkPipeline* GetGraphicsPipeline();
+        VkPipelineLayout* GetPipelineLayout();
+        VulkanDescriptorSets* GetDescriptorSets();
+    };
+
+    class VulkanComputePipeline
+    {
+    private:
+        VkPipelineLayout pipelineLayout;
+        VkPipeline       computePipeline;
+        VulkanDescriptorSets *descriptorSets;
+
+    public:
+        VulkanComputePipeline(
+                const std::string computeShaderName,
+                VulkanDescriptorSets* shaderDescriptorSets
+                );
+        ~VulkanComputePipeline();
+
+        VkPipeline* GetComputePipeline();
         VkPipelineLayout* GetPipelineLayout();
         VulkanDescriptorSets* GetDescriptorSets();
     };

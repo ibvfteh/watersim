@@ -4,23 +4,34 @@
 
 namespace estun
 {
-    VulkanDescriptorSets::VulkanDescriptorSets()
+    VkDescriptorSetLayoutBinding VulkanDescriptorSets::UboBinding()
     {
-        VkDescriptorSetLayoutBinding uboLayoutBinding = {};
-        uboLayoutBinding.binding = 0;
-        uboLayoutBinding.descriptorCount = 1;
-        uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        uboLayoutBinding.pImmutableSamplers = nullptr;
-        uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        return Binding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+    }
 
-        VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
-        samplerLayoutBinding.binding = 1;
-        samplerLayoutBinding.descriptorCount = 1;
-        samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        samplerLayoutBinding.pImmutableSamplers = nullptr;
-        samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    VkDescriptorSetLayoutBinding VulkanDescriptorSets::SamplerLayoutBinding()
+    {
+        return Binding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+    }
 
-        std::array<VkDescriptorSetLayoutBinding, 2> bindings = {uboLayoutBinding, samplerLayoutBinding};
+    VkDescriptorSetLayoutBinding VulkanDescriptorSets::Binding(VkDescriptorType type, VkShaderStageFlags flags)
+    {
+        VkDescriptorSetLayoutBinding binding = {};
+        //binding.binding = 1;
+        binding.descriptorCount = 1;
+        binding.descriptorType = type;
+        binding.pImmutableSamplers = nullptr;
+        binding.stageFlags = flags;
+
+        return binding;
+    }
+
+    VulkanDescriptorSets::VulkanDescriptorSets(std::vector<VkDescriptorSetLayoutBinding> bindings)
+    {
+        for (int i = 0; i < bindings.size(); i++)
+        {
+            bindings[i].binding = i;
+        }
         VkDescriptorSetLayoutCreateInfo layoutInfo = {};
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -98,5 +109,85 @@ namespace estun
 
             vkUpdateDescriptorSets(*VulkanDeviceLocator::GetLogicalDevice(), static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
         }
+    }
+
+    void VulkanDescriptorSets::CreateComputeDescriptorSets(
+        VkDescriptorPool* descriptorPool,
+        VkBuffer* vertexBufferA,
+        VkBuffer* vertexBufferB,
+        VkBuffer* vertexBufferC,
+        const VkDeviceSize& bufferInfoSize
+        )
+    {
+        std::vector<VkDescriptorSetLayout> layouts(1, descriptorSetLayout);
+        VkDescriptorSetAllocateInfo allocInfo = {};
+        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        allocInfo.descriptorPool = *descriptorPool;
+        allocInfo.descriptorSetCount = 1;
+        allocInfo.pSetLayouts = layouts.data();
+
+        descriptorSets.resize(1);
+        if (vkAllocateDescriptorSets(*VulkanDeviceLocator::GetLogicalDevice(), &allocInfo, descriptorSets.data()) != VK_SUCCESS) 
+        {
+            ES_CORE_ASSERT("Failed to allocate descriptor sets");
+        }
+
+        UpdateCompuiteDescriptorSets(
+            vertexBufferA,
+            vertexBufferB,
+            vertexBufferC,
+            bufferInfoSize);
+    }
+
+    void VulkanDescriptorSets::UpdateCompuiteDescriptorSets(
+        VkBuffer* vertexBufferA,
+        VkBuffer* vertexBufferB,
+        VkBuffer* vertexBufferC,
+        const VkDeviceSize& bufferInfoSize
+        )
+    {
+      
+        VkDescriptorBufferInfo bufferInfoA = {};
+        bufferInfoA.buffer = *vertexBufferA;
+        bufferInfoA.offset = 0;
+        bufferInfoA.range = bufferInfoSize;
+
+        VkDescriptorBufferInfo bufferInfoB = {};
+        bufferInfoB.buffer = *vertexBufferB;
+        bufferInfoB.offset = 0;
+        bufferInfoB.range = bufferInfoSize;
+
+        VkDescriptorBufferInfo bufferInfoC = {};
+        bufferInfoC.buffer = *vertexBufferC;
+        bufferInfoC.offset = 0;
+        bufferInfoC.range = bufferInfoSize;
+
+        std::array<VkWriteDescriptorSet, 3> descriptorWrites = {};
+
+        descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrites[0].dstSet = descriptorSets[0];
+        descriptorWrites[0].dstBinding = 0;
+        descriptorWrites[0].dstArrayElement = 0;
+        descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        descriptorWrites[0].descriptorCount = 1;
+        descriptorWrites[0].pBufferInfo = &bufferInfoA;
+
+        descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrites[1].dstSet = descriptorSets[0];
+        descriptorWrites[1].dstBinding = 1;
+        descriptorWrites[1].dstArrayElement = 0;
+        descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        descriptorWrites[1].descriptorCount = 1;
+        descriptorWrites[1].pBufferInfo = &bufferInfoB;
+
+        descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrites[2].dstSet = descriptorSets[0];
+        descriptorWrites[2].dstBinding = 2;
+        descriptorWrites[2].dstArrayElement = 0;
+        descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        descriptorWrites[2].descriptorCount = 1;
+        descriptorWrites[2].pBufferInfo = &bufferInfoC;
+
+        vkUpdateDescriptorSets(*VulkanDeviceLocator::GetLogicalDevice(), static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);  
     }
 }

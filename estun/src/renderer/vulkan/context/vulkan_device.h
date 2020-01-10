@@ -14,10 +14,11 @@ namespace estun
     {
         std::optional<uint32_t> graphicsFamily;
         std::optional<uint32_t> presentFamily;
+        std::optional<uint32_t> computeFamily;
 
         bool isComplete() 
         {
-            return graphicsFamily.has_value();
+            return graphicsFamily.has_value() && presentFamily.has_value() && computeFamily.has_value();
         }
     };
 
@@ -42,6 +43,7 @@ namespace estun
 
         VkQueue graphicsQueue;
         VkQueue presentQueue;
+        VkQueue computeQueue;
 
         int deviceId = 0;   
     public:
@@ -61,6 +63,7 @@ namespace estun
 
         VkQueue* GetGraphicsQueue();
         VkQueue* GetPresentQueue();
+        VkQueue* GetComputeQueue();
     private:
         void PickPhysicalDevice(VulkanInstance* instance, VulkanSurface* surface);
         void CreateLogicalDevice(VulkanInstance* instance, VulkanSurface* surface);

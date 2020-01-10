@@ -29,6 +29,11 @@ namespace estun
                 ES_CORE_ASSERT("Failed to create synchronization objects for a frame");
             }
         }
+        if (vkCreateSemaphore(*VulkanDeviceLocator::GetLogicalDevice(), &semaphoreInfo, nullptr, &computeAvailableSemaphores) != VK_SUCCESS ||
+            vkCreateSemaphore(*VulkanDeviceLocator::GetLogicalDevice(), &semaphoreInfo, nullptr, &computeFinishedSemaphores) != VK_SUCCESS) 
+        {
+            ES_CORE_ASSERT("Failed to create synchronization objects for a frame");
+        }
     }
 
     VulkanSemaphoresManager::~VulkanSemaphoresManager()
@@ -39,6 +44,8 @@ namespace estun
             vkDestroySemaphore(*VulkanDeviceLocator::GetLogicalDevice(), imageAvailableSemaphores[i], nullptr);
             vkDestroyFence(*VulkanDeviceLocator::GetLogicalDevice(), inFlightFences[i], nullptr);
         }
+        vkDestroySemaphore(*VulkanDeviceLocator::GetLogicalDevice(), computeAvailableSemaphores, nullptr);
+        vkDestroySemaphore(*VulkanDeviceLocator::GetLogicalDevice(), computeFinishedSemaphores, nullptr);
     }
 
     const std::vector<VkSemaphore>* VulkanSemaphoresManager::GetImageAvailableSemaphores() const
@@ -49,6 +56,16 @@ namespace estun
     const std::vector<VkSemaphore>* VulkanSemaphoresManager::GetRenderFinishedSemaphores() const
     {
         return &renderFinishedSemaphores;
+    }
+        
+    VkSemaphore* VulkanSemaphoresManager::GetComputeAvailableSemaphores() 
+    {
+        return &computeAvailableSemaphores;
+    }
+    
+    VkSemaphore* VulkanSemaphoresManager::GetComputeFinishedSemaphores() 
+    {
+        return &computeFinishedSemaphores;
     }
 
     const std::vector<VkFence>* VulkanSemaphoresManager::GetInFlightFences() const
