@@ -50,7 +50,7 @@ private:
 
     const std::vector<const char *> deviceExtensions = {
         "VK_KHR_swapchain",
-        "VK_KHR_get_physical_device_properties2",
+        "VK_KHR_maintenance3",
         "VK_KHR_get_memory_requirements2",
         "VK_EXT_descriptor_indexing",
         "VK_KHR_buffer_device_address",

@@ -37,10 +37,10 @@ Estun::Renderer::Vulkan::SwapChain::SwapChain(
     createInfo.clipped = VK_TRUE;
     createInfo.oldSwapchain = nullptr;
 
+    uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+    
     if (indices.graphicsFamily != indices.presentFamily)
     {
-        uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
-
         createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         createInfo.queueFamilyIndexCount = 2;
         createInfo.pQueueFamilyIndices = queueFamilyIndices;

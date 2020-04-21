@@ -150,14 +150,14 @@ int main(int argc, const char **argv)
         numberOfSamples = glm::clamp(maxNumberOfSamples - totalNumberOfSamples, 0u, numberOfSamples);
         totalNumberOfSamples += numberOfSamples;
 
-       // context->StartDraw();
+        context->StartDraw();
         //context->StartRayTracing();
        // pipeline.Bind();
        // descriptor.Bind();
         //context->EndRayTracing(shaderBindingTable);
-       // context->EndDraw();
+        context->EndDraw();
        // UBs[context->GetImageIndex()].SetValue(ubo);
-       // context->SubmitDraw();
+        context->SubmitDraw();
     }
 
     glfwDestroyWindow(window);

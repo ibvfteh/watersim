@@ -29,6 +29,9 @@ private:
 
     ValidationLayers *valLayers = nullptr;
 
+    const std::vector<const char *> instanceExtensions = {
+        "VK_KHR_get_physical_device_properties2"};
+
 public:
     Instance(const Instance &) = delete;
     Instance(Instance &&) = delete;
