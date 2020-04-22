@@ -117,7 +117,7 @@ int main(int argc, const char **argv)
             //Estun::Renderer::Vulkan::DescriptorBinding::Storage(5, IB, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
             //Estun::Renderer::Vulkan::DescriptorBinding::Storage(6, materialBuffer, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
             //Estun::Renderer::Vulkan::DescriptorBinding::Storage(7, offsetBuffer, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
-            Estun::Renderer::Vulkan::DescriptorBinding::Textures(8, textures, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
+            //Estun::Renderer::Vulkan::DescriptorBinding::Textures(8, textures, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
         };
 
     Estun::Renderer::Vulkan::Descriptor descriptor(descriptorBindings, context->GetSwapChain()->GetImageViews().size());

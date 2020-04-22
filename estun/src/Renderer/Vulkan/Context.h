@@ -103,6 +103,8 @@ private:
     std::unique_ptr<CommandBuffers> commandBuffers_;
     std::unique_ptr<ColorResources> colorResources_;
     std::unique_ptr<DepthResources> depthResources_;
+    std::unique_ptr<RenderPass> mainRenderPass_;
+    std::vector<Framebuffer> framebuffers_;
     std::vector<Semaphore> imageAvailableSemaphores_;
     std::vector<Semaphore> renderFinishedSemaphores_;
     std::vector<Fence> inFlightFences_;

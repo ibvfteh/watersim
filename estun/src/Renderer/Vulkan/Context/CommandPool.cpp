@@ -38,8 +38,45 @@ VkCommandPool Estun::Renderer::Vulkan::CommandPool::GetCommandPool() const
     return commandPool;
 }
 
-Estun::Renderer::Vulkan::CommandPool *Estun::Renderer::Vulkan::CommandPoolLocator::currGraphicsCommandPool;
+Estun::Renderer::Vulkan::CommandPool *Estun::Renderer::Vulkan::CommandPoolLocator::currGraphicsCommandPool = nullptr;
 
-Estun::Renderer::Vulkan::CommandPool *Estun::Renderer::Vulkan::CommandPoolLocator::currComputeCommandPool;
+Estun::Renderer::Vulkan::CommandPool *Estun::Renderer::Vulkan::CommandPoolLocator::currComputeCommandPool = nullptr;
 
-Estun::Renderer::Vulkan::CommandPool *Estun::Renderer::Vulkan::CommandPoolLocator::currTransferCommandPool;
+Estun::Renderer::Vulkan::CommandPool *Estun::Renderer::Vulkan::CommandPoolLocator::currTransferCommandPool = nullptr;
+
+Estun::Renderer::Vulkan::CommandPool &Estun::Renderer::Vulkan::CommandPoolLocator::GetGraphicsPool()
+{
+    if (currGraphicsCommandPool == nullptr)
+    {
+        ES_CORE_ASSERT("Failed to request vulkan graphics command pool");
+    }
+    return *currGraphicsCommandPool;
+}
+
+Estun::Renderer::Vulkan::CommandPool &Estun::Renderer::Vulkan::CommandPoolLocator::GetComputePool()
+{
+    if (currComputeCommandPool == nullptr)
+    {
+        ES_CORE_ASSERT("Failed to request vulkan graphics command pool");
+    }
+    return *currComputeCommandPool;
+}
+
+Estun::Renderer::Vulkan::CommandPool &Estun::Renderer::Vulkan::CommandPoolLocator::GetTransferPool()
+{
+    if (currTransferCommandPool == nullptr)
+    {
+        ES_CORE_ASSERT("Failed to request vulkan graphics command pool");
+    }
+    return *currTransferCommandPool;
+}
+
+void Estun::Renderer::Vulkan::CommandPoolLocator::Provide(
+    Estun::Renderer::Vulkan::CommandPool *graphicsCommandPool,
+    Estun::Renderer::Vulkan::CommandPool *computeCommandPool,
+    Estun::Renderer::Vulkan::CommandPool *transferCommandPool)
+{
+    currGraphicsCommandPool = graphicsCommandPool;
+    currComputeCommandPool = computeCommandPool;
+    currTransferCommandPool = transferCommandPool;
+}

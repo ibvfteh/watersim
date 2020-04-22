@@ -41,19 +41,14 @@ public:
 class CommandPoolLocator
 {
 public:
-    static CommandPool &GetGraphicsPool() { return *currGraphicsCommandPool; };
-    static CommandPool &GetComputePool() { return *currComputeCommandPool; };
-    static CommandPool &GetTransferPool() { return *currTransferCommandPool; };
+    static CommandPool &GetGraphicsPool();
+    static CommandPool &GetComputePool();
+    static CommandPool &GetTransferPool();
 
     static void Provide(
         CommandPool *graphicsCommandPool,
         CommandPool *computeCommandPool,
-        CommandPool *transferCommandPool)
-    {
-        currGraphicsCommandPool = graphicsCommandPool;
-        currComputeCommandPool = computeCommandPool;
-        currGraphicsCommandPool = currTransferCommandPool;
-    };
+        CommandPool *transferCommandPool);
 
 private:
     static CommandPool *currGraphicsCommandPool;
