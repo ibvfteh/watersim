@@ -3,11 +3,11 @@
 #include <vulkan/vulkan.h>
 
 #include "core/core.h"
-#include "renderer/vulkan/material/vulkan_texture_image.h"
-#include "renderer/vulkan/material/vulkan_texture_image_view.h"
-#include "renderer/vulkan/material/vulkan_texture_sampler.h"
-#include "renderer/vulkan/material/vulkan_descriptor_sets.h"
-#include "renderer/vulkan/material/vulkan_pipeline.h"
+#include "renderer/material/vulkan_texture_image.h"
+#include "renderer/material/vulkan_texture_image_view.h"
+#include "renderer/material/vulkan_texture_sampler.h"
+#include "renderer/material/vulkan_descriptor_sets.h"
+#include "renderer/material/vulkan_pipeline.h"
 
 #include <memory>
 #include <unordered_map>

@@ -1,6 +1,6 @@
 #include "renderer/vulkan/vulkan_material.h"
-#include "renderer/vulkan/material/vulkan_material_pool.h"
-#include "renderer/vulkan/material/vulkan_pipeline.h"
+#include "renderer/material/vulkan_material_pool.h"
+#include "renderer/material/vulkan_pipeline.h"
 
 
 namespace estun

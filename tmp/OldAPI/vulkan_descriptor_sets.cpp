@@ -1,6 +1,6 @@
-#include "Renderer/Vulkan/Material/DescriptorSets.h"
-#include "Renderer/Vulkan/Context/Device.h"
-//#include "Renderer/Vulkan/Context.h"
+#include "renderer/material/DescriptorSets.h"
+#include "renderer/context/Device.h"
+//#include "renderer/context.h"
 
 namespace estun
 {

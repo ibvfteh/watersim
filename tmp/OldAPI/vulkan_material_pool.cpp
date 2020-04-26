@@ -1,4 +1,4 @@
-#include "renderer/vulkan/material/vulkan_material_pool.h"
+#include "renderer/material/vulkan_material_pool.h"
 
 #include <iostream>
 #include <sstream>

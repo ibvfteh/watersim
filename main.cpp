@@ -4,7 +4,6 @@
 #include <iostream>
 #include <unordered_map>
 #include "tiny_obj_loader.h"
-#include "Core/Camera.h"
 
 #include "CornellBox.h"
 
@@ -22,9 +21,9 @@ float lastY = HEIGHT / 2.0f;
 bool firstMouse = true;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-Estun::Renderer::Vulkan::Context *context;
+estun::Context *context;
 
-Estun::Renderer::Vulkan::GameInfo info("test", {0, 0, 1}, WIDTH, HEIGHT, true, false);
+estun::GameInfo info("test", {0, 0, 1}, WIDTH, HEIGHT, true, false);
 
 //void CreateSurface(std::vector<estun::Vertex> &vertices, std::vector<uint32_t> &indices);
 
@@ -51,9 +50,9 @@ int main(int argc, const char **argv)
 
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    context = new Estun::Renderer::Vulkan::Context(window, &info);
-    Estun::Renderer::Vulkan::ContextLocator::Provide(context);
-    Estun::Renderer::Vulkan::Model cornell = CornellBox::CreateCornellBox(1.0);
+    context = new estun::Context(window, &info);
+    estun::ContextLocator::Provide(context);
+    estun::Model cornell = CornellBox::CreateCornellBox(1.0);
 
     //const auto cameraRotX = static_cast<float>(cameraY_ / 300.0);
     //const auto cameraRotY = static_cast<float>(cameraX_ / 300.0);
@@ -67,7 +66,7 @@ int main(int argc, const char **argv)
     unsigned numberOfSamples = 8;
     unsigned totalNumberOfSamples = 0;
 
-    Estun::Renderer::Vulkan::UniformBufferObject ubo = {};
+    estun::UniformBufferObject ubo = {};
     ubo.ModelView = view * model;
     ubo.Projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 10000.0f);
     ubo.Projection[1][1] *= -1;
@@ -84,7 +83,7 @@ int main(int argc, const char **argv)
 
     bool resetAccumulation = false;
 
-    std::vector<Estun::Renderer::Vulkan::UniformBuffer> UBs(context->GetSwapChain()->GetImageViews().size());
+    std::vector<estun::UniformBuffer> UBs(context->GetSwapChain()->GetImageViews().size());
     std::vector<glm::uvec2> offsets;
     const auto indexOffset = static_cast<uint32_t>(0);    // indices.size()
     const auto vertexOffset = static_cast<uint32_t>(0);   // vertices.size()
@@ -96,49 +95,49 @@ int main(int argc, const char **argv)
 		}
     */
     offsets.emplace_back(indexOffset, vertexOffset);
-    Estun::Renderer::Vulkan::VertexBuffer VB(cornell.GetVertices());
-    Estun::Renderer::Vulkan::IndexBuffer IB(cornell.GetIndices());
-    //Estun::Renderer::Vulkan::AccelerationStructureManager ASM;
-    std::vector<Estun::Renderer::Vulkan::Model> models = {cornell};
+    estun::VertexBuffer VB(cornell.GetVertices());
+    estun::IndexBuffer IB(cornell.GetIndices());
+    //estun::AccelerationStructureManager ASM;
+    std::vector<estun::Model> models = {cornell};
     //ASM.Submit(models, &VB, &IB, false);
 
-    //Estun::Renderer::Vulkan::StorageBuffer materialBuffer(cornell.GetMaterials());
-    //Estun::Renderer::Vulkan::StorageBuffer offsetBuffer(offsets);
+    //estun::StorageBuffer materialBuffer(cornell.GetMaterials());
+    //estun::StorageBuffer offsetBuffer(offsets);
 
-    std::vector<Estun::Renderer::Vulkan::Texture> textures;
+    std::vector<estun::Texture> textures;
 
-    std::vector<Estun::Renderer::Vulkan::DescriptorBinding> descriptorBindings =
+    std::vector<estun::DescriptorBinding> descriptorBindings =
         {
-            //Estun::Renderer::Vulkan::DescriptorBinding::AccelerationStructure(0, ASM.GetTLAS()[0], VK_SHADER_STAGE_RAYGEN_BIT_NV),
-            //Estun::Renderer::Vulkan::DescriptorBinding::ImageHolder(1, *context->GetAccumulationImage(), VK_SHADER_STAGE_RAYGEN_BIT_NV),
-            //Estun::Renderer::Vulkan::DescriptorBinding::ImageHolder(2, *context->GetOutputImage(), VK_SHADER_STAGE_RAYGEN_BIT_NV),
-            Estun::Renderer::Vulkan::DescriptorBinding::Uniform(3, UBs, VK_SHADER_STAGE_RAYGEN_BIT_NV | VK_SHADER_STAGE_MISS_BIT_NV),
-            //Estun::Renderer::Vulkan::DescriptorBinding::Storage(4, VB, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
-            //Estun::Renderer::Vulkan::DescriptorBinding::Storage(5, IB, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
-            //Estun::Renderer::Vulkan::DescriptorBinding::Storage(6, materialBuffer, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
-            //Estun::Renderer::Vulkan::DescriptorBinding::Storage(7, offsetBuffer, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
-            //Estun::Renderer::Vulkan::DescriptorBinding::Textures(8, textures, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
+            //estun::DescriptorBinding::AccelerationStructure(0, ASM.GetTLAS()[0], VK_SHADER_STAGE_RAYGEN_BIT_NV),
+            //estun::DescriptorBinding::ImageHolder(1, *context->GetAccumulationImage(), VK_SHADER_STAGE_RAYGEN_BIT_NV),
+            //estun::DescriptorBinding::ImageHolder(2, *context->GetOutputImage(), VK_SHADER_STAGE_RAYGEN_BIT_NV),
+            estun::DescriptorBinding::Uniform(3, UBs, VK_SHADER_STAGE_RAYGEN_BIT_NV | VK_SHADER_STAGE_MISS_BIT_NV),
+            //estun::DescriptorBinding::Storage(4, VB, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
+            //estun::DescriptorBinding::Storage(5, IB, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
+            //estun::DescriptorBinding::Storage(6, materialBuffer, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
+            //estun::DescriptorBinding::Storage(7, offsetBuffer, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
+            //estun::DescriptorBinding::Textures(8, textures, VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV),
         };
 
-    Estun::Renderer::Vulkan::Descriptor descriptor(descriptorBindings, context->GetSwapChain()->GetImageViews().size());
+    estun::Descriptor descriptor(descriptorBindings, context->GetSwapChain()->GetImageViews().size());
     /*
     std::vector<std::string> RTShaders = {
         "../assets/shaders/RayTracing.rgen.spv",
         "../assets/shaders/RayTracing.rmiss.spv",
         "../assets/shaders/RayTracing.rchit.spv",
-        "../assets/shaders/RayTracing.Procedural.rchit.spv",
-        "../assets/shaders/RayTracing.Procedural.rint.spv",
     };
-    Estun::Renderer::Vulkan::RayTracingPipeline pipeline(RTShaders, ASM.GetTLAS()[0], context->GetAccumulationImage()->GetImageView(), context->GetOutputImage()->GetImageView(), descriptor, UBs);
-    Estun::Renderer::Vulkan::RayTracingProperties properties;
+    estun::RayTracingPipeline pipeline(RTShaders, ASM.GetTLAS()[0], context->GetAccumulationImage()->GetImageView(), context->GetOutputImage()->GetImageView(), descriptor, UBs);
+    estun::RayTracingProperties properties;
 
-    const std::vector<Estun::Renderer::Vulkan::ShaderBindingTable::Entry> rayGenPrograms = {{pipeline.RayGenShaderIndex(), {}}};
-    const std::vector<Estun::Renderer::Vulkan::ShaderBindingTable::Entry> missPrograms = {{pipeline.MissShaderIndex(), {}}};
-    const std::vector<Estun::Renderer::Vulkan::ShaderBindingTable::Entry> hitGroups = {{pipeline.TriangleHitGroupIndex(), {}}};
+    const std::vector<estun::ShaderBindingTable::Entry> rayGenPrograms = {{pipeline.RayGenShaderIndex(), {}}};
+    const std::vector<estun::ShaderBindingTable::Entry> missPrograms = {{pipeline.MissShaderIndex(), {}}};
+    const std::vector<estun::ShaderBindingTable::Entry> hitGroups = {{pipeline.TriangleHitGroupIndex(), {}}};
 
-    Estun::Renderer::Vulkan::ShaderBindingTable shaderBindingTable(pipeline, properties, rayGenPrograms, missPrograms, hitGroups);
+    estun::ShaderBindingTable shaderBindingTable(pipeline, properties, rayGenPrograms, missPrograms, hitGroups);
 */
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+
+    estun::Render render;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -151,13 +150,17 @@ int main(int argc, const char **argv)
         totalNumberOfSamples += numberOfSamples;
 
         context->StartDraw();
+        render.StartDrawInCurrent();
         //context->StartRayTracing();
        // pipeline.Bind();
        // descriptor.Bind();
         //context->EndRayTracing(shaderBindingTable);
-        context->EndDraw();
-       // UBs[context->GetImageIndex()].SetValue(ubo);
-        context->SubmitDraw();
+        //context->EndDraw();
+        render.RecordDrawInCurrent();
+        std::vector<estun::Render> renders;
+        renders.push_back(render);
+        // UBs[context->GetImageIndex()].SetValue(ubo);
+        context->SubmitDraw(renders);
     }
 
     glfwDestroyWindow(window);

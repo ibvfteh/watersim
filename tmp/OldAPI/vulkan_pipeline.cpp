@@ -1,7 +1,7 @@
-#include "renderer/vulkan/material/vulkan_pipeline.h"
-#include "renderer/vulkan/material/vulkan_shader_manager.h"
+#include "renderer/material/vulkan_pipeline.h"
+#include "renderer/material/vulkan_shader_manager.h"
 #include "renderer/vulkan/vulkan_context.h"
-#include "renderer/vulkan/buffers/vulkan_vertex_buffer.h"
+#include "renderer/buffers/vulkan_vertex_buffer.h"
 
 namespace estun
 {

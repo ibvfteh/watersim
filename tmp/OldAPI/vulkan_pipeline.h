@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderer/Vulkan/SwapChain/RenderPass.h"
-#include "Renderer/Vulkan/Material/DescriptorSets.h"
+#include "renderer/material/DescriptorSets.h"
 
 #include <vulkan/vulkan.h>
 #include <string>

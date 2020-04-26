@@ -1,5 +1,5 @@
 #include "renderer/vulkan/vulkan_context.h"
-#include "renderer/vulkan/material/vulkan_shader_manager.h"
+#include "renderer/material/vulkan_shader_manager.h"
 #include <iostream>
 
 namespace estun {

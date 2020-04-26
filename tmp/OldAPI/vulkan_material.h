@@ -1,14 +1,14 @@
 #pragma once
 
-#include "renderer/vulkan/material/vulkan_descriptor_pool.h"
-#include "renderer/vulkan/material/vulkan_descriptor_sets.h"
-#include "renderer/vulkan/material/vulkan_texture_image.h"
-#include "renderer/vulkan/material/vulkan_texture_sampler.h"
-#include "renderer/vulkan/material/vulkan_texture_image_view.h"
-#include "renderer/vulkan/material/vulkan_pipeline.h"
+#include "renderer/material/vulkan_descriptor_pool.h"
+#include "renderer/material/vulkan_descriptor_sets.h"
+#include "renderer/material/vulkan_texture_image.h"
+#include "renderer/material/vulkan_texture_sampler.h"
+#include "renderer/material/vulkan_texture_image_view.h"
+#include "renderer/material/vulkan_pipeline.h"
 
-#include "renderer/vulkan/buffers/vulkan_uniform_buffer.h"
-#include "renderer/vulkan/buffers/vulkan_vertex_buffer.h"
+#include "renderer/buffers/vulkan_uniform_buffer.h"
+#include "renderer/buffers/vulkan_vertex_buffer.h"
 
 namespace estun
 {

@@ -1,17 +1,17 @@
 
 #pragma once
 
-#include "Renderer/Vulkan/Model.h"
+#include "renderer/model.h"
 #include <vector>
 
 class CornellBox
 {
 public:
-    static Estun::Renderer::Vulkan::Model CreateCornellBox(const float scale);
+    static estun::Model CreateCornellBox(const float scale);
 
     static void Create(
         float scale,
-        std::vector<Estun::Renderer::Vulkan::Vertex> &vertices,
+        std::vector<estun::Vertex> &vertices,
         std::vector<uint32_t> &indices,
-        std::vector<Estun::Renderer::Vulkan::Material> &materials);
+        std::vector<estun::Material> &materials);
 };
