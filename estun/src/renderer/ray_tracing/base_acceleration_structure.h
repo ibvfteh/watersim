@@ -15,11 +15,12 @@ struct MemoryRequirements
 class BaseAccelerationStructure
 {
 public:
-    class BaseAccelerationStructure(const BaseAccelerationStructure &) = delete;
+    BaseAccelerationStructure(const BaseAccelerationStructure &) = delete;
+    BaseAccelerationStructure(BaseAccelerationStructure &&other) noexcept;
+    
     BaseAccelerationStructure &operator=(const BaseAccelerationStructure &) = delete;
     BaseAccelerationStructure &operator=(BaseAccelerationStructure &&) = delete;
 
-    BaseAccelerationStructure(BaseAccelerationStructure &&other) noexcept;
 
     virtual ~BaseAccelerationStructure();
 

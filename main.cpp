@@ -36,7 +36,7 @@ bool put = false;
 
 int main(int argc, const char **argv)
 {
-    Estun::Log::Init();
+    estun::Log::Init();
 
     glfwInit();
 

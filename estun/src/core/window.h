@@ -7,7 +7,7 @@
 #include <vector>
 #include <GLFW/glfw3.h>
 
-namespace Estun
+namespace estun
 {
 
 struct WindowConfig
@@ -57,4 +57,4 @@ private:
     GLFWwindow *window_{};
 };
 
-} // namespace Estun
+} // namespace estun

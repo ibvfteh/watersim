@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Log.h"
+#include "core/log.h"
 #include <memory>
 #include <cstring>
 #include <cmath>

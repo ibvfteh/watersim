@@ -30,9 +30,7 @@ public:
         const std::vector<UniformBuffer> &uniformBuffers);
     ~RayTracingPipeline();
 
-    void Bind();
-
-    static std::vector<DescriptorBinding> RayTracingPipeline::GetDescriptorBindings(const uint32_t samplersCount);
+    void Bind(VkCommandBuffer &commandBuffer);
 
     uint32_t RayGenShaderIndex() const { return rayGenIndex_; }
     uint32_t MissShaderIndex() const { return missIndex_; }

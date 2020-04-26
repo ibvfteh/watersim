@@ -1,5 +1,5 @@
 #include "renderer/ray_tracing/base_acceleration_structure.h"
-#include "renderer/context/Device.h"
+#include "renderer/context/device.h"
 
 #undef MemoryBarrier
 

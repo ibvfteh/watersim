@@ -16,6 +16,7 @@
 //#include "renderer/ray_tracing/ShaderBildingTable.h"
 #include "renderer/buffers/buffer.h"
 #include "renderer/context/image.h"
+#include "renderer/context/image_view.h"
 
 #include "renderer/context/image_holder.h"
 

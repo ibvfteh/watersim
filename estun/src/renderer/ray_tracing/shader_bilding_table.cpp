@@ -1,6 +1,6 @@
 #include "renderer/ray_tracing//shader_bilding_table.h"
-#include "renderer/buffers/Buffer.h"
-#include "renderer/context/Device.h"
+#include "renderer/buffers/buffer.h"
+#include "renderer/context/device.h"
 #include "renderer/ray_tracing/ray_tracing_pipeline.h"
 #include "renderer/ray_tracing/ray_tracing_properties.h"
 #include "renderer/device_memory.h"

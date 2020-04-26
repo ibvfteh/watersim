@@ -91,9 +91,9 @@ estun::RayTracingPipeline::~RayTracingPipeline()
     }
 }
 
-void estun::RayTracingPipeline::Bind()
+void estun::RayTracingPipeline::Bind(VkCommandBuffer &commandBuffer)
 {
-    vkCmdBindPipeline(ContextLocator::GetCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipeline_);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipeline_);
 }
 
 VkPipeline estun::RayTracingPipeline::GetPipeline() const

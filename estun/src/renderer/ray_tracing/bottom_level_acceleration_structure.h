@@ -14,15 +14,16 @@ class BottomLevelAccelerationStructure : public BaseAccelerationStructure
 {
 public:
     BottomLevelAccelerationStructure(const BottomLevelAccelerationStructure &) = delete;
+    BottomLevelAccelerationStructure(BottomLevelAccelerationStructure &&other) noexcept;
+    
     BottomLevelAccelerationStructure &operator=(const BottomLevelAccelerationStructure &) = delete;
     BottomLevelAccelerationStructure &operator=(BottomLevelAccelerationStructure &&) = delete;
 
     BottomLevelAccelerationStructure(
-        const std::vector<VkAccelerationStructureGeometryKHR *> &geometries,
+        const std::vector<VkAccelerationStructureGeometryKHR> &geometries,
         const std::vector<VkAccelerationStructureCreateGeometryTypeInfoKHR> &geometryInfos,
         const std::vector<VkAccelerationStructureBuildOffsetInfoKHR> &buildOffsetInfos,
         bool allowUpdate);
-    BottomLevelAccelerationStructure(BottomLevelAccelerationStructure &&other) noexcept;
     ~BottomLevelAccelerationStructure();
 
     void Generate(
@@ -38,7 +39,7 @@ public:
     static VkAccelerationStructureBuildOffsetInfoKHR CreateBuildOffsetInfo(uint32_t primitiveCount, uint32_t primitiveOffset, uint32_t firstVertex);
 
 private:
-    std::vector<VkAccelerationStructureGeometryKHR *> geometries_;
+    std::vector<VkAccelerationStructureGeometryKHR> geometries_;
     std::vector<VkAccelerationStructureCreateGeometryTypeInfoKHR> geometryInfos_;
     std::vector<VkAccelerationStructureBuildOffsetInfoKHR> buildOffsetInfos_;
 };

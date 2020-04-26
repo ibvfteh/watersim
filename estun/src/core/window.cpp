@@ -1,5 +1,5 @@
-#include "Core/Window.h"
-#include "Core/Core.h"
+#include "core/window.h"
+#include "core/core.h"
 #include <stb_image.h>
 #include <iostream>
 #include <string>
@@ -13,7 +13,7 @@ namespace
 
 	void GlfwKeyCallback(GLFWwindow* window, const int key, const int scancode, const int action, const int mods)
 	{
-		const auto this_ = reinterpret_cast<Estun::Window*>(glfwGetWindowUserPointer(window));
+		const auto this_ = reinterpret_cast<estun::Window*>(glfwGetWindowUserPointer(window));
 		if (this_->OnKey)
 		{
 			this_->OnKey(key, scancode, action, mods);
@@ -22,7 +22,7 @@ namespace
 
 	void GlfwCursorPositionCallback(GLFWwindow* window, const double xpos, const double ypos)
 	{
-		const auto this_ = reinterpret_cast<Estun::Window*>(glfwGetWindowUserPointer(window));
+		const auto this_ = reinterpret_cast<estun::Window*>(glfwGetWindowUserPointer(window));
 		if (this_->OnCursorPosition)
 		{
 			this_->OnCursorPosition(xpos, ypos);
@@ -31,7 +31,7 @@ namespace
 
 	void GlfwMouseButtonCallback(GLFWwindow* window, const int button, const int action, const int mods)
 	{
-		const auto this_ = reinterpret_cast<Estun::Window*>(glfwGetWindowUserPointer(window));
+		const auto this_ = reinterpret_cast<estun::Window*>(glfwGetWindowUserPointer(window));
 		if (this_->OnMouseButton)
 		{
 			this_->OnMouseButton(button, action, mods);
@@ -39,7 +39,7 @@ namespace
 	}
 }
 
-Estun::Window::Window(const WindowConfig& config) :
+estun::Window::Window(const WindowConfig& config) :
 	config_(config)
 {
 	glfwSetErrorCallback(GlfwErrorCallback);
@@ -86,7 +86,7 @@ Estun::Window::Window(const WindowConfig& config) :
 	glfwSetMouseButtonCallback(window_, GlfwMouseButtonCallback);
 }
 
-Estun::Window::~Window()
+estun::Window::~Window()
 {
 	if (window_ != nullptr)
 	{
@@ -98,14 +98,14 @@ Estun::Window::~Window()
 	glfwSetErrorCallback(nullptr);
 }
 
-std::vector<const char*> Estun::Window::GetRequiredInstanceExtensions() const
+std::vector<const char*> estun::Window::GetRequiredInstanceExtensions() const
 {
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 	return std::vector<const char*>(glfwExtensions, glfwExtensions + glfwExtensionCount);
 }
 
-float Estun::Window::ContentScale() const
+float estun::Window::ContentScale() const
 {
 	float xscale;
 	float yscale;
@@ -114,37 +114,37 @@ float Estun::Window::ContentScale() const
 	return xscale;
 }
 
-double Estun::Window::Time() const
+double estun::Window::Time() const
 {
 	return glfwGetTime();
 }
 
-VkExtent2D Estun::Window::FramebufferSize() const
+VkExtent2D estun::Window::FramebufferSize() const
 {
 	int width, height;
 	glfwGetFramebufferSize(window_, &width, &height);
 	return VkExtent2D{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 }
 
-VkExtent2D Estun::Window::WindowSize() const
+VkExtent2D estun::Window::WindowSize() const
 {
 	int width, height;
 	glfwGetWindowSize(window_, &width, &height);
 	return VkExtent2D{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 }
 
-void Estun::Window::Close() const
+void estun::Window::Close() const
 {
 	glfwSetWindowShouldClose(window_, 1);
 }
 
-bool Estun::Window::IsMinimized() const
+bool estun::Window::IsMinimized() const
 {
 	const auto size = FramebufferSize();
 	return size.height == 0 && size.width == 0;
 }
 
-void Estun::Window::Run() const
+void estun::Window::Run() const
 {
 	glfwSetTime(0.0);
 
@@ -159,7 +159,7 @@ void Estun::Window::Run() const
 	}
 }
 
-void Estun::Window::WaitForEvents() const
+void estun::Window::WaitForEvents() const
 {
 	glfwWaitEvents();
 }

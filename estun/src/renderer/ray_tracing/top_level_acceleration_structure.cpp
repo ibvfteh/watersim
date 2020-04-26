@@ -3,9 +3,9 @@
 #include "renderer/context/single_time_commands.h"
 #include "renderer/ray_tracing/base_acceleration_structure.h"
 #include "renderer/ray_tracing/bottom_level_acceleration_structure.h"
-#include "renderer/buffers/Buffer.h"
+#include "renderer/buffers/buffer.h"
 #include "renderer/device_memory.h"
-#include "renderer/material/Descriptable.h"
+#include "renderer/material/descriptable.h"
 #include <cstring>
 
 namespace
@@ -68,7 +68,7 @@ void estun::TopLevelAccelerationStructure::Generate(
         ES_CORE_ASSERT("Cannot update readonly structure");
     }
 
-    const VkAccelerationStructureKHR previousStructure = updateOnly ? GetStructure() : nullptr;
+    const VkAccelerationStructureKHR previousStructure = updateOnly ? GetStructure() : 0;
 
     VkBindAccelerationStructureMemoryInfoKHR bindInfo = {};
     bindInfo.sType = VK_STRUCTURE_TYPE_BIND_ACCELERATION_STRUCTURE_MEMORY_INFO_KHR;
@@ -85,7 +85,8 @@ void estun::TopLevelAccelerationStructure::Generate(
                            ? VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_NV
                            : VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_NV;
 
-    const VkAccelerationStructureGeometryKHR *pGeometries = &CreateGeometry(geometryInstances_);
+    const VkAccelerationStructureGeometryKHR geometries = CreateGeometry(geometryInstances_);
+    const VkAccelerationStructureGeometryKHR *pGeometries = &geometries;
 
     VkAccelerationStructureBuildGeometryInfoKHR buildInfo = {};
     buildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
@@ -99,7 +100,8 @@ void estun::TopLevelAccelerationStructure::Generate(
     buildInfo.geometryCount = 1;
     buildInfo.ppGeometries = &pGeometries;
 
-    const VkAccelerationStructureBuildOffsetInfoKHR *pOffsets = &CreateBuildOffsetInfo(geometryInstances_.size(), 0);
+    const VkAccelerationStructureBuildOffsetInfoKHR offsets = CreateBuildOffsetInfo(geometryInstances_.size(), 0);
+    const VkAccelerationStructureBuildOffsetInfoKHR *pOffsets = &offsets;
 
     vkCmdBuildAccelerationStructureKHR(commandBuffer, 1, &buildInfo, &pOffsets);
 }

@@ -1,6 +1,6 @@
 #include "renderer/context.h"
 
-#include "Renderer/model.h"
+#include "renderer/model.h"
 #include "renderer/material/material.h"
 #include "renderer/buffers/storage_buffer.h"
 #include "renderer/buffers/uniform_buffer.h"

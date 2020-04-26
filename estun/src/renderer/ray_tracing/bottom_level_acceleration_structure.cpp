@@ -30,7 +30,7 @@ VkAccelerationStructureCreateInfoKHR GetCreateInfo(const std::vector<VkAccelerat
 } // namespace
 
 estun::BottomLevelAccelerationStructure::BottomLevelAccelerationStructure(
-    const std::vector<VkAccelerationStructureGeometryKHR *> &geometries,
+    const std::vector<VkAccelerationStructureGeometryKHR> &geometries,
     const std::vector<VkAccelerationStructureCreateGeometryTypeInfoKHR> &geometryInfos,
     const std::vector<VkAccelerationStructureBuildOffsetInfoKHR> &buildOffsetInfos,
     const bool allowUpdate)
@@ -64,7 +64,7 @@ void estun::BottomLevelAccelerationStructure::Generate(
         ES_CORE_ASSERT("Cannot update readonly structure");
     }
 
-    const VkAccelerationStructureKHR previousStructure = updateOnly ? GetStructure() : nullptr;
+    const VkAccelerationStructureKHR previousStructure = updateOnly ? GetStructure() : 0;
 
     // Bind the acceleration structure descriptor to the actual memory that will contain it
     VkBindAccelerationStructureMemoryInfoKHR bindInfo = {};
@@ -102,7 +102,9 @@ void estun::BottomLevelAccelerationStructure::Generate(
     buildInfo.dstAccelerationStructure = GetStructure();
     buildInfo.geometryArrayOfPointers = VK_TRUE;
     buildInfo.geometryCount = geometries_.size();
-    buildInfo.ppGeometries = geometries_.data();
+
+    const VkAccelerationStructureGeometryKHR *pGeometries = geometries_.data();
+    buildInfo.ppGeometries = &pGeometries;
 
     const VkAccelerationStructureBuildOffsetInfoKHR *pOffsets = buildOffsetInfos_.data();
 

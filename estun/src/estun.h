@@ -1,4 +1,4 @@
 #include "renderer/renderer.h"
-#include "Core/Window.h"
-#include "Core/Core.h"
-#include "Core/Camera.h"
+#include "core/window.h"
+#include "core/core.h"
+#include "core/camera.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Core.h"
+#include "core/core.h"
 #include "renderer/common.h"
 
 namespace estun

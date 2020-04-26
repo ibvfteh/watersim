@@ -26,4 +26,4 @@ public:
 	~ColorResources();
 };
 
-} // namespace Estun
+} // namespace estun
