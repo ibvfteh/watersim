@@ -97,9 +97,9 @@ int main(int argc, const char **argv)
     offsets.emplace_back(indexOffset, vertexOffset);
     estun::VertexBuffer VB(cornell.GetVertices());
     estun::IndexBuffer IB(cornell.GetIndices());
-    //estun::AccelerationStructureManager ASM;
+    estun::AccelerationStructureManager ASM;
     std::vector<estun::Model> models = {cornell};
-    //ASM.Submit(models, &VB, &IB, false);
+    ASM.Submit(models, &VB, &IB, false);
 
     //estun::StorageBuffer materialBuffer(cornell.GetMaterials());
     //estun::StorageBuffer offsetBuffer(offsets);

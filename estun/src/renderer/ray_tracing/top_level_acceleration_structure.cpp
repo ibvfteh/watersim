@@ -7,6 +7,7 @@
 #include "renderer/device_memory.h"
 #include "renderer/material/descriptable.h"
 #include <cstring>
+#include "renderer/context/dynamic_functions.h"
 
 namespace
 {
@@ -79,7 +80,7 @@ void estun::TopLevelAccelerationStructure::Generate(
     bindInfo.deviceIndexCount = 0;
     bindInfo.pDeviceIndices = nullptr;
 
-    VK_CHECK_RESULT(vkBindAccelerationStructureMemoryKHR(DeviceLocator::GetLogicalDevice(), 1, &bindInfo), "bind acceleration structure");
+    VK_CHECK_RESULT(FunctionsLocator::GetFunctions().vkBindAccelerationStructureMemoryKHR(DeviceLocator::GetLogicalDevice(), 1, &bindInfo), "bind acceleration structure");
 
     const auto flags = allowUpdate_
                            ? VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_NV
@@ -103,7 +104,7 @@ void estun::TopLevelAccelerationStructure::Generate(
     const VkAccelerationStructureBuildOffsetInfoKHR offsets = CreateBuildOffsetInfo(geometryInstances_.size(), 0);
     const VkAccelerationStructureBuildOffsetInfoKHR *pOffsets = &offsets;
 
-    vkCmdBuildAccelerationStructureKHR(commandBuffer, 1, &buildInfo, &pOffsets);
+    FunctionsLocator::GetFunctions().vkCmdBuildAccelerationStructureKHR(commandBuffer, 1, &buildInfo, &pOffsets);
 }
 
 VkAccelerationStructureGeometryKHR estun::TopLevelAccelerationStructure::CreateGeometry(

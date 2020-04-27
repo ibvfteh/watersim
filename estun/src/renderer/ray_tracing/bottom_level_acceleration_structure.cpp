@@ -4,6 +4,7 @@
 #include "renderer/ray_tracing/base_acceleration_structure.h"
 #include "renderer/buffers/buffer.h"
 #include "renderer/device_memory.h"
+#include "renderer/context/dynamic_functions.h"
 
 namespace
 {
@@ -76,7 +77,7 @@ void estun::BottomLevelAccelerationStructure::Generate(
     bindInfo.deviceIndexCount = 0;
     bindInfo.pDeviceIndices = nullptr;
 
-    VK_CHECK_RESULT(vkBindAccelerationStructureMemoryKHR(DeviceLocator::GetLogicalDevice(), 1, &bindInfo), "bind acceleration structure");
+    VK_CHECK_RESULT(FunctionsLocator::GetFunctions().vkBindAccelerationStructureMemoryKHR(DeviceLocator::GetLogicalDevice(), 1, &bindInfo), "bind acceleration structure");
 
     // Build the actual bottom-level acceleration structure
     const auto flags = allowUpdate_
@@ -108,7 +109,7 @@ void estun::BottomLevelAccelerationStructure::Generate(
 
     const VkAccelerationStructureBuildOffsetInfoKHR *pOffsets = buildOffsetInfos_.data();
 
-    vkCmdBuildAccelerationStructureKHR(commandBuffer, 1, &buildInfo, &pOffsets);
+    FunctionsLocator::GetFunctions().vkCmdBuildAccelerationStructureKHR(commandBuffer, 1, &buildInfo, &pOffsets);
 }
 
 VkAccelerationStructureGeometryKHR estun::BottomLevelAccelerationStructure::CreateGeometry(
@@ -167,7 +168,7 @@ VkDeviceAddress estun::BottomLevelAccelerationStructure::GetDeviceAddress() cons
     deviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
     deviceAddressInfo.pNext = nullptr;
     deviceAddressInfo.accelerationStructure = GetStructure();
-    VkDeviceAddress deviceAddress = vkGetAccelerationStructureDeviceAddressKHR(DeviceLocator::GetLogicalDevice(), &deviceAddressInfo);
+    VkDeviceAddress deviceAddress = FunctionsLocator::GetFunctions().vkGetAccelerationStructureDeviceAddressKHR(DeviceLocator::GetLogicalDevice(), &deviceAddressInfo);
     if (deviceAddress == 0)
     {
         ES_CORE_ASSERT("Failed to find device address for bottom level acceleration structure");

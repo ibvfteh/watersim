@@ -7,6 +7,7 @@
 #include "renderer/buffers/uniform_buffer.h"
 #include "renderer/material/descriptor.h"
 #include "renderer/material/descriptor_binding.h"
+#include "renderer/context/dynamic_functions.h"
 
 estun::RayTracingPipeline::RayTracingPipeline(
     const std::vector<std::string> shaders,
@@ -79,7 +80,7 @@ estun::RayTracingPipeline::RayTracingPipeline(
     pipelineInfo.basePipelineHandle = nullptr;
     pipelineInfo.basePipelineIndex = 0;
 
-    VK_CHECK_RESULT(vkCreateRayTracingPipelinesKHR(DeviceLocator::GetLogicalDevice(), nullptr, 1, &pipelineInfo, nullptr, &pipeline_), "create ray tracing pipeline");
+    VK_CHECK_RESULT(FunctionsLocator::GetFunctions().vkCreateRayTracingPipelinesKHR(DeviceLocator::GetLogicalDevice(), nullptr, 1, &pipelineInfo, nullptr, &pipeline_), "create ray tracing pipeline");
 }
 
 estun::RayTracingPipeline::~RayTracingPipeline()

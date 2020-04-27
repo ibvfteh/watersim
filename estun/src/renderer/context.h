@@ -9,6 +9,7 @@
 #include "renderer/context/instance.h"
 #include "renderer/context/surface.h"
 #include "renderer/context/device.h"
+#include "renderer/context/dynamic_functions.h"
 #include "renderer/context/swap_chain.h"
 #include "renderer/context/command_pool.h"
 #include "renderer/context/command_buffers.h"
@@ -75,6 +76,7 @@ private:
     std::unique_ptr<Instance> instance_;
     std::unique_ptr<Surface> surface_;
     std::unique_ptr<Device> device_;
+    std::unique_ptr<DynamicFunctions> dynamicFunctions_;
     std::unique_ptr<SwapChain> swapChain_;
     std::unique_ptr<CommandPool> graphicsCommandPool_;
     std::unique_ptr<CommandPool> computeCommandPool_;

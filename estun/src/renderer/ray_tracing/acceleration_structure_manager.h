@@ -19,14 +19,14 @@ public:
     AccelerationStructureManager(const AccelerationStructureManager &) = delete;
     AccelerationStructureManager &operator=(const AccelerationStructureManager &) = delete;
     AccelerationStructureManager &operator=(AccelerationStructureManager &&) = delete;
-    AccelerationStructureManager();
+    AccelerationStructureManager() {};
 
     void Submit(std::vector<Model> &models, VertexBuffer *vertexBuffer, IndexBuffer *indexBuffer, bool allowUpdate);
 
     //void Update(std::vector<Model> &models, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, bool allowUpdate);
 
     AccelerationStructureManager(AccelerationStructureManager &&other) noexcept;
-    ~AccelerationStructureManager();
+    ~AccelerationStructureManager() {};
 
     std::vector<BottomLevelAccelerationStructure> &GetBLAS() { return bottomAs_; }
     std::vector<TopLevelAccelerationStructure> &GetTLAS() { return topAs_; }

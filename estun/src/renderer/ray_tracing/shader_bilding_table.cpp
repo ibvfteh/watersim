@@ -4,6 +4,7 @@
 #include "renderer/ray_tracing/ray_tracing_pipeline.h"
 #include "renderer/ray_tracing/ray_tracing_properties.h"
 #include "renderer/device_memory.h"
+#include "renderer/context/dynamic_functions.h"
 
 namespace
 {
@@ -74,7 +75,7 @@ estun::ShaderBindingTable::ShaderBindingTable(
     const size_t groupCount = rayGenPrograms.size() + missPrograms.size() + hitGroups.size();
     std::vector<uint8_t> shaderHandleStorage(groupCount * handleSize);
 
-    VK_CHECK_RESULT(vkGetRayTracingShaderGroupHandlesKHR(
+    VK_CHECK_RESULT(FunctionsLocator::GetFunctions().vkGetRayTracingShaderGroupHandlesKHR(
               DeviceLocator::GetLogicalDevice(),
               rayTracingPipeline.GetPipeline(),
               0, static_cast<uint32_t>(groupCount),

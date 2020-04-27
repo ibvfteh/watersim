@@ -16,8 +16,10 @@ estun::Context::Context(GLFWwindow *windowHandle, GameInfo *gameInfo)
     surface_.reset(new Surface(instance_.get(), windowHandle));
     ES_CORE_INFO("Surface done");
     device_.reset(new Device(instance_.get(), surface_.get()));
-    ES_CORE_INFO("Device done");
     DeviceLocator::Provide(device_.get());
+    dynamicFunctions_.reset(new DynamicFunctions());
+    FunctionsLocator::Provide(dynamicFunctions_.get());
+    ES_CORE_INFO("Device done");
 
     graphicsCommandPool_.reset(new CommandPool(Graphics));
     ES_CORE_INFO("Graphics command pool done");
