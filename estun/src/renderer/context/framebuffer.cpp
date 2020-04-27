@@ -6,14 +6,14 @@
 #include "renderer/context.h"
 
 estun::Framebuffer::Framebuffer(
-    const std::vector<ImageView> &attachments,
+    const std::vector<ImageView*> &attachments,
     const std::unique_ptr<RenderPass> &renderPass)
 {
     
     std::vector<VkImageView> vkAttachments;
     for (auto & at : attachments)
     {
-        vkAttachments.push_back(at.GetImageView());
+        vkAttachments.push_back(at->GetImageView());
     }
 
     if (attachments.size() == 0)

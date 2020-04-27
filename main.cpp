@@ -157,8 +157,8 @@ int main(int argc, const char **argv)
         //context->EndRayTracing(shaderBindingTable);
         //context->EndDraw();
         render.RecordDrawInCurrent();
-        std::vector<estun::Render> renders;
-        renders.push_back(render);
+        std::vector<estun::Render*> renders;
+        renders.push_back(&render);
         // UBs[context->GetImageIndex()].SetValue(ubo);
         context->SubmitDraw(renders);
     }

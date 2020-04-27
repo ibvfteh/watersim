@@ -27,23 +27,24 @@ estun::BaseAccelerationStructure::~BaseAccelerationStructure()
 
 estun::MemoryRequirements estun::BaseAccelerationStructure::GetMemoryRequirements() const
 {
-    VkAccelerationStructureMemoryRequirementsInfoNV memoryRequirementsInfo{};
+    VkAccelerationStructureMemoryRequirementsInfoKHR memoryRequirementsInfo{};
     memoryRequirementsInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_INFO_KHR;
     memoryRequirementsInfo.pNext = nullptr;
+    memoryRequirementsInfo.buildType = VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR;
     memoryRequirementsInfo.accelerationStructure = accelerationStructure_;
 
     // If the descriptor already contains the geometry info, so we can directly compute the estimated size and required scratch memory.
     VkMemoryRequirements2 memoryRequirements = {};
     memoryRequirementsInfo.type = VK_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_TYPE_OBJECT_KHR;
-    vkGetAccelerationStructureMemoryRequirementsNV(DeviceLocator::GetLogicalDevice(), &memoryRequirementsInfo, &memoryRequirements);
+    vkGetAccelerationStructureMemoryRequirementsKHR(DeviceLocator::GetLogicalDevice(), &memoryRequirementsInfo, &memoryRequirements);
     const auto resultRequirements = memoryRequirements.memoryRequirements;
 
     memoryRequirementsInfo.type = VK_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_TYPE_BUILD_SCRATCH_KHR;
-    vkGetAccelerationStructureMemoryRequirementsNV(DeviceLocator::GetLogicalDevice(), &memoryRequirementsInfo, &memoryRequirements);
+    vkGetAccelerationStructureMemoryRequirementsKHR(DeviceLocator::GetLogicalDevice(), &memoryRequirementsInfo, &memoryRequirements);
     const auto buildRequirements = memoryRequirements.memoryRequirements;
 
     memoryRequirementsInfo.type = VK_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_TYPE_UPDATE_SCRATCH_KHR;
-    vkGetAccelerationStructureMemoryRequirementsNV(DeviceLocator::GetLogicalDevice(), &memoryRequirementsInfo, &memoryRequirements);
+    vkGetAccelerationStructureMemoryRequirementsKHR(DeviceLocator::GetLogicalDevice(), &memoryRequirementsInfo, &memoryRequirements);
     const auto updateRequirements = memoryRequirements.memoryRequirements;
 
     return {resultRequirements, buildRequirements, updateRequirements};
@@ -67,7 +68,7 @@ void estun::BaseAccelerationStructure::ASMemoryBarrier(VkCommandBuffer commandBu
         0, 1, &memoryBarrier, 0, nullptr, 0, nullptr);
 }
 
-VkAccelerationStructureNV estun::BaseAccelerationStructure::GetStructure() const
+VkAccelerationStructureKHR estun::BaseAccelerationStructure::GetStructure() const
 {
     return accelerationStructure_;
 }

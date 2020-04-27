@@ -115,7 +115,7 @@ void estun::Context::EndDraw()
 }
 */
 
-void estun::Context::SubmitDraw(std::vector<Render> &renders)
+void estun::Context::SubmitDraw(std::vector<Render*> &renders)
 {
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -127,7 +127,7 @@ void estun::Context::SubmitDraw(std::vector<Render> &renders)
     std::vector<VkCommandBuffer> commandBuffers;
     for(auto & render : renders)
     {
-        commandBuffers.push_back(render.GetCurrCommandBuffer());
+        commandBuffers.push_back(render->GetCurrCommandBuffer());
     }
     VkSemaphore waitSemaphores[] = {imageAvailableSemaphore};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};

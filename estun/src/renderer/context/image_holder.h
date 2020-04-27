@@ -28,7 +28,7 @@ public:
     DescriptableInfo GetInfo() override;
 
     const Image &GetImage() const { return *image_; }
-    const ImageView &GetImageView() const { return *imageView_; }
+    const std::unique_ptr<ImageView>& GetImageView() const { return imageView_; }
     const Sampler &GetSampler() const { return *sampler_; }
 
 private:

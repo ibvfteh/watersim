@@ -16,7 +16,7 @@ public:
     Framebuffer &operator=(Framebuffer &&) = delete;
 
     explicit Framebuffer(
-        const std::vector<ImageView> &attachments,
+        const std::vector<ImageView*> &attachments,
         const std::unique_ptr<RenderPass> &renderPass);
     Framebuffer(Framebuffer &&other) noexcept;
     ~Framebuffer();

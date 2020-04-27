@@ -37,20 +37,20 @@ void estun::Render::CreateRender()
 
     for (int i = 0; i < size; i++)
     {
-        std::vector<ImageView> attachments;
+        std::vector<ImageView*> attachments;
         if (toDefault_)
         {
-            attachments.push_back((*ContextLocator::GetSwapChain()->GetImageViews()[i]));
+            attachments.push_back(ContextLocator::GetSwapChain()->GetImageViews()[i].get());
         }
         else
         {
-            attachments.push_back(colorResources_->GetImageView());
+            attachments.push_back(colorResources_->GetImageView().get());
         }
-        attachments.push_back(depthResources_->GetImageView());
+        attachments.push_back(depthResources_->GetImageView().get());
 
         if (msaa)
         {
-            attachments.push_back(colorResolveResources_->GetImageView());
+            attachments.push_back(colorResolveResources_->GetImageView().get());
         }
 
         framebuffers_.push_back(Framebuffer(attachments, renderPass_));

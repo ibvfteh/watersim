@@ -57,7 +57,7 @@ public:
 
     void StartDraw();
     //void EndDraw();
-    void SubmitDraw(std::vector<Render> &renders);
+    void SubmitDraw(std::vector<Render*> &renders);
 
     void DrawIndexed(uint32_t indexesSize, uint32_t indexOffset, uint32_t vertexOffset);
 
