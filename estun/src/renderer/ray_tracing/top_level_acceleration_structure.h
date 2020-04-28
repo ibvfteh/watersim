@@ -2,7 +2,7 @@
 
 #include "renderer/common.h"
 
-#include <glm/glm.hpp>
+#include "includes/glm.h"
 #include "renderer/ray_tracing/base_acceleration_structure.h"
 #include "renderer/material/descriptable.h"
 

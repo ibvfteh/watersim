@@ -25,10 +25,10 @@ estun::Buffer::~Buffer()
     }
 }
 
-estun::DeviceMemory estun::Buffer::AllocateMemory(const VkMemoryPropertyFlags properties)
+estun::DeviceMemory estun::Buffer::AllocateMemory(const VkMemoryPropertyFlags properties, bool flag)
 {
     const auto requirements = GetMemoryRequirements();
-    DeviceMemory memory(requirements.size, requirements.memoryTypeBits, properties);
+    DeviceMemory memory(requirements.size, requirements.memoryTypeBits, properties, flag);
 
     VK_CHECK_RESULT(vkBindBufferMemory(DeviceLocator::GetLogicalDevice(), buffer, memory.GetMemory(), 0), "Failed to bind buffer memory");
 
@@ -59,7 +59,7 @@ VkDeviceAddress estun::Buffer::GetDeviceAddress() const
     VkBufferDeviceAddressInfo info;
     info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
     info.pNext = nullptr;
-    info.buffer = GetBuffer();
+    info.buffer = buffer;
     VkDeviceAddress deviceAddress = vkGetBufferDeviceAddress(DeviceLocator::GetLogicalDevice(), &info);
     return deviceAddress;
 }

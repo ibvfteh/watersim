@@ -1,7 +1,7 @@
 #pragma once
 
 #include "renderer/common.h"
-#include <glm/glm.hpp>
+#include "includes/glm.h"
 #include "renderer/buffers/vertex.h"
 #include "renderer/material/material.h"
 

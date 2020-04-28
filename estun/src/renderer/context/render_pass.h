@@ -19,7 +19,7 @@ public:
     RenderPass &operator=(const RenderPass &) = delete;
     RenderPass &operator=(RenderPass &&) = delete;
 
-    RenderPass();
+    RenderPass(bool msaa);
     ~RenderPass();
 
     void Begin(Framebuffer &farmebuffer, VkCommandBuffer &commandBuffer);

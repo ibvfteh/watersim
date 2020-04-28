@@ -56,23 +56,23 @@ VkWriteDescriptorSet estun::DescriptorSets::Bind(const uint32_t index, const uin
 	{
 		ES_CORE_ASSERT("Colliding descriptable info");
 	}
-	bool HasValue = false;
+	bool hasValue = false;
 	if (info.bI.has_value())
 	{
 		descriptorWrite.pBufferInfo = &info.bI.value();
-		bool HasValue = true;
+		hasValue = true;
 	}
 	if (info.iI.has_value())
 	{
 		descriptorWrite.pImageInfo = &info.iI.value();
-		bool HasValue = true;
+		hasValue = true;
 	}
 	if (info.asI.has_value())
 	{
 		descriptorWrite.pNext = &info.asI.value();
-		bool HasValue = true;
+		hasValue = true;
 	}
-	if (!HasValue)
+	if (!hasValue)
 	{
 		ES_CORE_ASSERT("No descriptable info");
 	}
@@ -82,6 +82,7 @@ VkWriteDescriptorSet estun::DescriptorSets::Bind(const uint32_t index, const uin
 
 void estun::DescriptorSets::UpdateDescriptors(uint32_t index, const std::vector<VkWriteDescriptorSet> &descriptorWrites)
 {
+	ES_CORE_INFO("update");
 	vkUpdateDescriptorSets(
 		DeviceLocator::GetLogicalDevice(),
 		static_cast<uint32_t>(descriptorWrites.size()),

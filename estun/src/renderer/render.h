@@ -41,16 +41,17 @@ public:
 
     void StartDrawInCurrent();
     void RecordDrawInCurrent();
-    void Bind(std::unique_ptr<Descriptor> &descriptor);
-    void Bind(std::unique_ptr<GraphicsPipeline> &pipeline);
-    void Bind(std::unique_ptr<VertexBuffer> &vertexBuffer);
-    void Bind(std::unique_ptr<IndexBuffer> &indexBuffer);
+    void Bind(Descriptor &descriptor);
+    void Bind(GraphicsPipeline &pipeline);
+    void Bind(VertexBuffer &vertexBuffer);
+    void Bind(IndexBuffer &indexBuffer);
     void DrawIndexed(uint32_t indexesSize, uint32_t indexOffset, uint32_t vertexOffset);
 
     //void CreateRayTracingOutputImage();
     //void DeleteRayTracingOutputImage();
 
     VkCommandBuffer &GetCurrCommandBuffer();
+    RenderPass &GetRenderPass() { return *renderPass_; };
     
 /*
     VkFramebuffer &GetFramebuffer(uint32_t index);
@@ -65,7 +66,6 @@ private:
     std::unique_ptr<DepthResources> depthResources_;
     std::unique_ptr<ColorResources> colorResolveResources_;
     std::unique_ptr<RenderPass> renderPass_;
-    std::shared_ptr<GraphicsPipeline> currPipeline_;
     std::vector<Framebuffer> framebuffers_;
 
     std::unique_ptr<ImageHolder> accumulationImage_;

@@ -43,13 +43,13 @@ message(${ALL_LIBS})
 # Engine
 file(GLOB_RECURSE HEADER_FILES
 	estun/src/*.h
-    CornellBox.h
+    cornell_box.h
     )
 
 file(GLOB_RECURSE SOURCE_FILES
 	estun/src/*.cpp
     main.cpp
-    CornellBox.cpp
+    cornell_box.cpp
     )
 
 #message(${SOURCE_FILES})

@@ -20,7 +20,7 @@ public:
 	Buffer(size_t size, VkBufferUsageFlags usage);
 	~Buffer();
 
-	DeviceMemory AllocateMemory(VkMemoryPropertyFlags properties);
+	DeviceMemory AllocateMemory(VkMemoryPropertyFlags properties, bool flag = false);
 	VkMemoryRequirements GetMemoryRequirements() const;
 	VkDeviceAddress GetDeviceAddress() const;
 

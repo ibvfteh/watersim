@@ -4,11 +4,20 @@
 estun::DeviceMemory::DeviceMemory(
 	const size_t size, 
 	const uint32_t memoryTypeBits, 
-	const VkMemoryPropertyFlags properties) 
+	const VkMemoryPropertyFlags properties,
+	bool flag) 
 {
+	VkMemoryAllocateFlagsInfo flagsInfo = {};
+	flagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
+	flagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT;
+
 	VkMemoryAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = size;
+	if (flag)
+	{
+		allocInfo.pNext = &flagsInfo;
+	}
 	allocInfo.memoryTypeIndex = FindMemoryType(memoryTypeBits, properties);
 
 	VK_CHECK_RESULT(vkAllocateMemory(DeviceLocator::GetLogicalDevice(), &allocInfo, nullptr, &memory), "Failed to allocate memory");

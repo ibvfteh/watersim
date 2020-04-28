@@ -16,7 +16,7 @@ struct DescriptableInfo
         bool x1 = bI.has_value();
         bool x2 = iI.has_value();
         bool x3 = asI.has_value();
-        return x1 && !x2 && !x3 || !x1 && x2 && !x3 || !x1 && !x2 && x3;
+        return (x1 || x2 || !x3) && (x1 || !x2 || x3) && (!x1 || x2 || x3);
     }
 };
 

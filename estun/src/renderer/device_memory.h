@@ -12,7 +12,7 @@ public:
 	DeviceMemory &operator=(const DeviceMemory &) = delete;
 	DeviceMemory &operator=(DeviceMemory &&) = delete;
 
-	DeviceMemory(size_t size, uint32_t memoryTypeBits, VkMemoryPropertyFlags properties);
+	DeviceMemory(size_t size, uint32_t memoryTypeBits, VkMemoryPropertyFlags properties, bool flag = false);
 	DeviceMemory(DeviceMemory &&other) noexcept;
 	~DeviceMemory();
 

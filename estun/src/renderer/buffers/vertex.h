@@ -2,8 +2,7 @@
 
 #include "renderer/common.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtx/hash.hpp>
+#include "includes/glm.h"
 
 namespace estun
 {

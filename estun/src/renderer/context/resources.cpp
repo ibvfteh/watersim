@@ -13,7 +13,7 @@ estun::DepthResources::DepthResources(const VkExtent2D &extent, VkSampleCountFla
                   msaaSamples,
                   FindDepthFormat(),
                   VK_IMAGE_TILING_OPTIMAL,
-                  VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+                  VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                   VK_IMAGE_ASPECT_DEPTH_BIT)
 {
 }
@@ -65,8 +65,8 @@ estun::ColorResources::ColorResources(const VkExtent2D &extent, VkSampleCountFla
                   msaaSamples,
                   ContextLocator::GetSwapChain()->GetFormat(),
                   VK_IMAGE_TILING_OPTIMAL,
-                  VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-                  VK_IMAGE_ASPECT_DEPTH_BIT)
+                  VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                  VK_IMAGE_ASPECT_COLOR_BIT)
 {
 }
 

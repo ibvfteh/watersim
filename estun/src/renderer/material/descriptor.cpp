@@ -34,10 +34,10 @@ estun::Descriptor::Descriptor(const std::vector<DescriptorBinding> &descriptorBi
         {
             for (int j = 0; j < descriptorBindings[binding].descriptable_.size(); j++)
             {
-                auto info = descriptorBindings[binding].descriptable_[j].GetInfo();
+                DescriptableInfo info = descriptorBindings[binding].descriptable_[j]->GetInfo();
                 if (info.bI.has_value())
                 {
-                    descriptorWrites.push_back(descriptorSets->Bind(index, descriptorBindings[index].binding_, info));
+                    descriptorWrites.push_back(descriptorSets->Bind(index, descriptorBindings[binding].binding_, info));
                 }
             }
         }

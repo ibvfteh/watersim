@@ -19,7 +19,6 @@ estun::ImageView::ImageView(VkImage *image, const uint32_t mipLevels)
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount = 1;
 
-    VkImageView imageView;
     VK_CHECK_RESULT(vkCreateImageView(DeviceLocator::GetLogicalDevice(), &viewInfo, nullptr, &imageView), "Failed to create image view");
 }
 
@@ -40,7 +39,6 @@ estun::ImageView::ImageView(estun::Image *image, VkImageAspectFlags aspectFlags)
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount = 1;
 
-    VkImageView imageView;
     VK_CHECK_RESULT(vkCreateImageView(DeviceLocator::GetLogicalDevice(), &viewInfo, nullptr, &imageView) , "Failed to create image view");
 }
 
@@ -61,7 +59,6 @@ estun::ImageView::ImageView(const VkImage image, VkFormat format, VkImageAspectF
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount = 1;
 
-    VkImageView imageView;
     VK_CHECK_RESULT(vkCreateImageView(DeviceLocator::GetLogicalDevice(), &viewInfo, nullptr, &imageView) , "Failed to create image view");
 }
 

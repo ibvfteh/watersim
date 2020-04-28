@@ -23,11 +23,12 @@ public:
     StorageBuffer &operator=(const StorageBuffer &) = delete;
     StorageBuffer &operator=(StorageBuffer &&) = delete;
 
-    StorageBuffer(const std::vector<T> &storage)
+    StorageBuffer(const std::vector<T> &storage,
+                  VkBufferUsageFlags usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT)
     {
         const auto bufferSize = sizeof(storage[0]) * storage.size();
-        buffer.reset(new Buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT));
-        memory.reset(new DeviceMemory(buffer->AllocateMemory(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)));
+        buffer.reset(new Buffer(bufferSize, usage));
+        memory.reset(new DeviceMemory(buffer->AllocateMemory(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true)));
         buffer->CopyFromStagingBuffer<T>(storage);
     }
 
@@ -68,7 +69,8 @@ protected:
 class VertexBuffer : public StorageBuffer<Vertex>
 {
 public:
-    VertexBuffer(const std::vector<Vertex> &storage) : StorageBuffer(storage) {}
+    VertexBuffer(const std::vector<Vertex> &storage)
+        : StorageBuffer(storage, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) {}
     void Bind(VkCommandBuffer &commandBuffer)
     {
         VkBuffer vertexBuffers[] = {buffer->GetBuffer()};
@@ -80,7 +82,8 @@ public:
 class IndexBuffer : public StorageBuffer<uint32_t>
 {
 public:
-    IndexBuffer(const std::vector<uint32_t> &storage) : StorageBuffer(storage) {}
+    IndexBuffer(const std::vector<uint32_t> &storage)
+        : StorageBuffer(storage, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) {}
     void Bind(VkCommandBuffer &commandBuffer)
     {
         const VkBuffer indexBuffer = buffer->GetBuffer();

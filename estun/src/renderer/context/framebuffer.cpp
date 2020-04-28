@@ -20,6 +20,7 @@ estun::Framebuffer::Framebuffer(
     {
         ES_CORE_ASSERT("Failed to create framebuffer, attachments are empty")
     }
+
     VkFramebufferCreateInfo framebufferInfo = {};
     framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     framebufferInfo.renderPass = renderPass->GetRenderPass();
