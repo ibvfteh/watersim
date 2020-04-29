@@ -58,9 +58,11 @@ public:
 
     void StartDraw();
     //void EndDraw();
-    void SubmitDraw(std::vector<Render*> &renders);
+    void SubmitDraw();
 
     void DrawIndexed(uint32_t indexesSize, uint32_t indexOffset, uint32_t vertexOffset);
+
+    std::shared_ptr<Render> CreateRender();
 
     //void CreateRayTracingOutputImage();
     //void DeleteRayTracingOutputImage();
@@ -85,6 +87,8 @@ private:
     std::vector<Semaphore> imageAvailableSemaphores_;
     std::vector<Semaphore> renderFinishedSemaphores_;
     std::vector<Fence> inFlightFences_;
+
+    std::vector<std::shared_ptr<Render>> renders_;
 
     // TODO VK_POLYGON_MODE_LINE
     // VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;

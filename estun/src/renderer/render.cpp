@@ -68,6 +68,7 @@ void estun::Render::CreateRender()
 
 void estun::Render::DestroyRender()
 {
+    pipelines_.clear();
     framebuffers_.clear();
     renderPass_.reset();
     colorResolveResources_.reset();
@@ -82,6 +83,16 @@ void estun::Render::RecreateRender()
     CreateRender();
 }
 
+std::shared_ptr<estun::GraphicsPipeline> estun::Render::CreatePipeline(
+        const std::string vertexShaderName,
+        const std::string fragmentShaderName,
+        const std::shared_ptr<Descriptor> descriptor)
+{
+    std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(new GraphicsPipeline(vertexShaderName, fragmentShaderName, *renderPass_, *descriptor, false));
+    pipelines_.push_back(pipeline);
+    return pipeline;
+}
+
 void estun::Render::StartDrawInCurrent()
 {
     commandBuffers_->Begin(ContextLocator::GetImageIndex());
@@ -94,24 +105,24 @@ void estun::Render::RecordDrawInCurrent()
     commandBuffers_->End(ContextLocator::GetImageIndex());
 }
 
-void estun::Render::Bind(Descriptor &descriptor)
+void estun::Render::Bind(std::shared_ptr<Descriptor> descriptor)
 {
-    descriptor.Bind(GetCurrCommandBuffer());
+    descriptor->Bind(GetCurrCommandBuffer());
 }
 
-void estun::Render::Bind(GraphicsPipeline &pipeline)
+void estun::Render::Bind(std::shared_ptr<GraphicsPipeline> pipeline)
 {
-    pipeline.Bind(GetCurrCommandBuffer());
+    pipeline->Bind(GetCurrCommandBuffer());
 }
 
-void estun::Render::Bind(VertexBuffer &vertexBuffer)
+void estun::Render::Bind(std::shared_ptr<VertexBuffer> vertexBuffer)
 {
-    vertexBuffer.Bind(GetCurrCommandBuffer());
+    vertexBuffer->Bind(GetCurrCommandBuffer());
 }
 
-void estun::Render::Bind(IndexBuffer &indexBuffer)
+void estun::Render::Bind(std::shared_ptr<IndexBuffer> indexBuffer)
 {
-    indexBuffer.Bind(GetCurrCommandBuffer());
+    indexBuffer->Bind(GetCurrCommandBuffer());
 }
 
 VkCommandBuffer &estun::Render::GetCurrCommandBuffer()
@@ -123,4 +134,3 @@ void estun::Render::DrawIndexed(uint32_t indexesSize, uint32_t indexOffset, uint
 {
     vkCmdDrawIndexed(GetCurrCommandBuffer(), indexesSize, 1, indexOffset, vertexOffset, 0);
 }
-

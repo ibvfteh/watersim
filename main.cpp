@@ -18,7 +18,6 @@ float lastY = HEIGHT / 2.0f;
 bool firstMouse = true;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-estun::Context *context;
 
 estun::GameInfo info("test", {0, 0, 1}, WIDTH, HEIGHT, true, false);
 
@@ -31,6 +30,10 @@ bool put = false;
 
 int main(int argc, const char **argv)
 {
+
+    VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
+
     estun::Log::Init();
 
     glfwInit();
@@ -45,13 +48,14 @@ int main(int argc, const char **argv)
 
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    context = new estun::Context(window, &info);
-    estun::ContextLocator::Provide(context);
+    std::shared_ptr<estun::Context> context;
+    context.reset(new estun::Context(window, &info));
+    estun::ContextLocator::Provide(context.get());
 
     estun::UniformBufferObject ubo = {};
-    ubo.model = glm::mat4(1.0f);//glm::rotate(glm::mat4(1.0f), 0.5f * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.view = glm::mat4(1.0f);//glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.projection = glm::mat4(1.0f);//glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 10.0f);
+    ubo.model = glm::rotate(glm::mat4(1.0f), 0.5f * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 10.0f);
     //ubo.projection[1][1] *= -1;
 
     std::vector<estun::UniformBuffer> UBs(context->GetSwapChain()->GetImageViews().size());
@@ -65,51 +69,50 @@ int main(int argc, const char **argv)
         {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, 1},
         {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, 1},
         {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, 1},
-        {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, 1}};
+        {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, 1}
+    };
 
     const std::vector<uint32_t> indices = {
-        0, 1, 2, 2, 3, 0,
-        4, 5, 6, 6, 7, 4};
+        2, 1, 0, 0, 3, 2,
+        6, 5, 4, 4, 7, 6
+    };
 
-    estun::VertexBuffer VB(vertices);
-    estun::IndexBuffer IB(indices);
+    std::shared_ptr<estun::VertexBuffer> VB = std::make_shared<estun::VertexBuffer>(estun::VertexBuffer(vertices));
+    std::shared_ptr<estun::IndexBuffer> IB = std::make_shared<estun::IndexBuffer>(estun::IndexBuffer(indices));
 
-    std::vector<estun::DescriptorBinding> descriptorBindings =
-        {
-            estun::DescriptorBinding::Uniform(0, UBs, VK_SHADER_STAGE_VERTEX_BIT)
-        };
+    std::vector<estun::DescriptorBinding> descriptorBindings = {
+        estun::DescriptorBinding::Uniform(0, UBs, VK_SHADER_STAGE_VERTEX_BIT)
+    };
 
-    estun::Descriptor descriptor(descriptorBindings, context->GetSwapChain()->GetImageViews().size());
+    std::shared_ptr<estun::Descriptor> descriptor = std::make_shared<estun::Descriptor>(estun::Descriptor(descriptorBindings, context->GetSwapChain()->GetImageViews().size()));
 
-    estun::Render render;
-    estun::GraphicsPipeline pipeline("shaders/main.vert.spv", "shaders/main.frag.spv", render.GetRenderPass(), descriptor, false);
-
-    glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+    std::shared_ptr<estun::Render> render = context->CreateRender();
+    std::shared_ptr<estun::GraphicsPipeline> pipeline = render->CreatePipeline("shaders/main.vert.spv", "shaders/main.frag.spv", descriptor);
 
     while (!glfwWindowShouldClose(window))
     {
+        glfwPollEvents();
+
         context->StartDraw();
 
-        render.StartDrawInCurrent();
-        render.Bind(descriptor);
-        render.Bind(pipeline);
-        render.Bind(VB);
-        render.Bind(IB);
-        render.DrawIndexed(indices.size(), 0, 0);
-        render.RecordDrawInCurrent();
+        render->StartDrawInCurrent();
+        render->Bind(descriptor);
+        render->Bind(pipeline);
+        render->Bind(VB);
+        render->Bind(IB);
+        render->DrawIndexed(indices.size(), 0, 0);
+        render->RecordDrawInCurrent();
 
-        //ubo.view = camera.GetViewMatrix();
-        //ubo.projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 10000.0f);
-        //UBs[context->GetImageIndex()].SetValue(ubo);
+        ubo.view = camera.GetViewMatrix();
+        ubo.projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 10000.0f);
+        UBs[context->GetImageIndex()].SetValue(ubo);
 
-        std::vector<estun::Render *> renders;
-        renders.push_back(&render);
-        context->SubmitDraw(renders);
+        context->SubmitDraw();
     }
 
     glfwDestroyWindow(window);
     glfwTerminate();
-    delete context;
+    context.reset();
     return 0;
 }
 

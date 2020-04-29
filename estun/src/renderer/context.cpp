@@ -71,6 +71,7 @@ void estun::Context::CreateSwapChain()
 
 void estun::Context::DeleteSwapChain()
 {
+    renders_.clear();
     //DeleteRayTracingOutputImage();
     inFlightFences_.clear();
     renderFinishedSemaphores_.clear();
@@ -86,6 +87,13 @@ void estun::Context::RecreateSwapChain()
     device_->WaitIdle();
     DeleteSwapChain();
     CreateSwapChain();
+}
+
+std::shared_ptr<estun::Render> estun::Context::CreateRender()
+{
+    std::shared_ptr<Render> render = std::make_shared<Render>(new Render);
+    renders_.push_back(render);
+    return render;
 }
 
 void estun::Context::StartDraw()
@@ -111,13 +119,7 @@ void estun::Context::StartDraw()
     }
 }
 
-/*
-void estun::Context::EndDraw()
-{
-}
-*/
-
-void estun::Context::SubmitDraw(std::vector<Render*> &renders)
+void estun::Context::SubmitDraw()
 {
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -127,7 +129,7 @@ void estun::Context::SubmitDraw(std::vector<Render*> &renders)
     auto &inFlightFence = inFlightFences_[currentFrame_];
 
     std::vector<VkCommandBuffer> commandBuffers;
-    for(auto & render : renders)
+    for (auto &render : renders_)
     {
         commandBuffers.push_back(render->GetCurrCommandBuffer());
     }

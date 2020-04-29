@@ -39,12 +39,17 @@ public:
     void DestroyRender();
     void RecreateRender();
 
+    std::shared_ptr<GraphicsPipeline> CreatePipeline(
+        const std::string vertexShaderName,
+        const std::string fragmentShaderName,
+        const std::shared_ptr<Descriptor> descriptor);
+
     void StartDrawInCurrent();
     void RecordDrawInCurrent();
-    void Bind(Descriptor &descriptor);
-    void Bind(GraphicsPipeline &pipeline);
-    void Bind(VertexBuffer &vertexBuffer);
-    void Bind(IndexBuffer &indexBuffer);
+    void Bind(std::shared_ptr<Descriptor> descriptor);
+    void Bind(std::shared_ptr<GraphicsPipeline> pipeline);
+    void Bind(std::shared_ptr<VertexBuffer> vertexBuffer);
+    void Bind(std::shared_ptr<IndexBuffer> indexBuffer);
     void DrawIndexed(uint32_t indexesSize, uint32_t indexOffset, uint32_t vertexOffset);
 
     //void CreateRayTracingOutputImage();
@@ -70,6 +75,8 @@ private:
 
     std::unique_ptr<ImageHolder> accumulationImage_;
     std::unique_ptr<ImageHolder> outputImage_;
+
+    std::vector<std::shared_ptr<GraphicsPipeline>> pipelines_;
 
     // TODO VK_POLYGON_MODE_LINE
     // VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
