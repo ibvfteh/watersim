@@ -98,8 +98,6 @@ private:
     uint32_t imageIndex_;
     bool vsync_;
     uint32_t currentFrame_{};
-    bool isWireFrame_;
-    bool setWireFrame_;
     VkSampleCountFlagBits msaa_;
 
     //uint32_t maxFramesInFlight_ = 2;

@@ -91,7 +91,7 @@ void estun::Context::RecreateSwapChain()
 
 std::shared_ptr<estun::Render> estun::Context::CreateRender()
 {
-    std::shared_ptr<Render> render = std::make_shared<Render>(new Render);
+    std::shared_ptr<Render> render = std::make_shared<Render>();
     renders_.push_back(render);
     return render;
 }
@@ -107,7 +107,7 @@ void estun::Context::StartDraw()
 
     auto result = vkAcquireNextImageKHR(device_->GetLogicalDevice(), swapChain_->GetSwapChain(), noTimeout, imageAvailableSemaphore, nullptr, &imageIndex_);
 
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || isWireFrame_ != setWireFrame_)
+    if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
         RecreateSwapChain();
         return;

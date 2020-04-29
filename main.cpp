@@ -48,8 +48,7 @@ int main(int argc, const char **argv)
 
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    std::shared_ptr<estun::Context> context;
-    context.reset(new estun::Context(window, &info));
+    std::shared_ptr<estun::Context> context = std::make_shared<estun::Context>(window, &info);
     estun::ContextLocator::Provide(context.get());
 
     estun::UniformBufferObject ubo = {};
@@ -77,14 +76,14 @@ int main(int argc, const char **argv)
         6, 5, 4, 4, 7, 6
     };
 
-    std::shared_ptr<estun::VertexBuffer> VB = std::make_shared<estun::VertexBuffer>(estun::VertexBuffer(vertices));
-    std::shared_ptr<estun::IndexBuffer> IB = std::make_shared<estun::IndexBuffer>(estun::IndexBuffer(indices));
+    std::shared_ptr<estun::VertexBuffer> VB = std::make_shared<estun::VertexBuffer>(vertices);
+    std::shared_ptr<estun::IndexBuffer> IB = std::make_shared<estun::IndexBuffer>(indices);
 
     std::vector<estun::DescriptorBinding> descriptorBindings = {
         estun::DescriptorBinding::Uniform(0, UBs, VK_SHADER_STAGE_VERTEX_BIT)
     };
 
-    std::shared_ptr<estun::Descriptor> descriptor = std::make_shared<estun::Descriptor>(estun::Descriptor(descriptorBindings, context->GetSwapChain()->GetImageViews().size()));
+    std::shared_ptr<estun::Descriptor> descriptor = std::make_shared<estun::Descriptor>(descriptorBindings, context->GetSwapChain()->GetImageViews().size());
 
     std::shared_ptr<estun::Render> render = context->CreateRender();
     std::shared_ptr<estun::GraphicsPipeline> pipeline = render->CreatePipeline("shaders/main.vert.spv", "shaders/main.frag.spv", descriptor);

@@ -88,7 +88,7 @@ std::shared_ptr<estun::GraphicsPipeline> estun::Render::CreatePipeline(
         const std::string fragmentShaderName,
         const std::shared_ptr<Descriptor> descriptor)
 {
-    std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(new GraphicsPipeline(vertexShaderName, fragmentShaderName, *renderPass_, *descriptor, false));
+    std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(vertexShaderName, fragmentShaderName, *renderPass_, *descriptor, false);
     pipelines_.push_back(pipeline);
     return pipeline;
 }
