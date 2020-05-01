@@ -52,32 +52,21 @@ int main(int argc, const char **argv)
     estun::ContextLocator::Provide(context.get());
 
     estun::UniformBufferObject ubo = {};
-    ubo.model = glm::rotate(glm::mat4(1.0f), 0.5f * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.model = glm::mat4(1.0f);
     ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 10.0f);
     //ubo.projection[1][1] *= -1;
 
     std::vector<estun::UniformBuffer> UBs(context->GetSwapChain()->GetImageViews().size());
+    estun::Model model(CornellBox::CreateCornellBox(1.0f));
 
-    const std::vector<estun::Vertex> vertices = {
-        {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, 1},
-        {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, 1},
-        {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, 1},
-        {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, 1},
+    std::shared_ptr<estun::VertexBuffer> VB = std::make_shared<estun::VertexBuffer>(model.GetVertices());
+    std::shared_ptr<estun::IndexBuffer> IB = std::make_shared<estun::IndexBuffer>(model.GetIndices());
+    std::shared_ptr<estun::AccelerationStructureManager> ASM = std::make_shared<estun::AccelerationStructureManager>();
+	//std::vector<estun::Material> materials;
+    //materials.push_back(estun::Material::Lambertian(glm::vec3(0.65f, 0.05f, 0.05f)));
 
-        {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, 1},
-        {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, 1},
-        {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, 1},
-        {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, 1}
-    };
-
-    const std::vector<uint32_t> indices = {
-        2, 1, 0, 0, 3, 2,
-        6, 5, 4, 4, 7, 6
-    };
-
-    std::shared_ptr<estun::VertexBuffer> VB = std::make_shared<estun::VertexBuffer>(vertices);
-    std::shared_ptr<estun::IndexBuffer> IB = std::make_shared<estun::IndexBuffer>(indices);
+    ASM->Submit(std::vector<estun::Model>{model}, VB.get(), IB.get(), false);
 
     std::vector<estun::DescriptorBinding> descriptorBindings = {
         estun::DescriptorBinding::Uniform(0, UBs, VK_SHADER_STAGE_VERTEX_BIT)
@@ -99,7 +88,7 @@ int main(int argc, const char **argv)
         render->Bind(pipeline);
         render->Bind(VB);
         render->Bind(IB);
-        render->DrawIndexed(indices.size(), 0, 0);
+        render->DrawIndexed(model.GetIndices().size(), 0, 0);
         render->RecordDrawInCurrent();
 
         ubo.view = camera.GetViewMatrix();

@@ -14,8 +14,10 @@ estun::GraphicsPipeline::GraphicsPipeline(
     const std::string fragmentShaderName,
     std::unique_ptr<RenderPass> &renderPass,
     std::shared_ptr<Descriptor> descriptor,
+    VkSampleCountFlagBits msaa,
     const bool isWireFrame)
-    : isWireFrame_(isWireFrame),
+    : msaa_(msaa),
+      isWireFrame_(isWireFrame),
       descriptor_(descriptor)
 {
     // Load shaders.
@@ -47,9 +49,11 @@ void estun::GraphicsPipeline::Create(std::unique_ptr<RenderPass> &renderPass)
 
     VkViewport viewport = {};
     viewport.x = 0.0f;
-    viewport.y = 0.0f;
+    viewport.y = static_cast<float>(ContextLocator::GetSwapChain()->GetExtent().height); 
+    //viewport.y =  0
     viewport.width = static_cast<float>(ContextLocator::GetSwapChain()->GetExtent().width);
-    viewport.height = static_cast<float>(ContextLocator::GetSwapChain()->GetExtent().height);
+    viewport.height = -static_cast<float>(ContextLocator::GetSwapChain()->GetExtent().height); 
+    //viewport.height = static_cast<float>(ContextLocator::GetSwapChain()->GetExtent().height);
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
@@ -80,7 +84,8 @@ void estun::GraphicsPipeline::Create(std::unique_ptr<RenderPass> &renderPass)
     VkPipelineMultisampleStateCreateInfo multisampling = {};
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     multisampling.sampleShadingEnable = VK_FALSE;
-    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    //multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    multisampling.rasterizationSamples = msaa_;
     multisampling.minSampleShading = 1.0f;
     multisampling.pSampleMask = nullptr;
     multisampling.alphaToCoverageEnable = VK_FALSE;

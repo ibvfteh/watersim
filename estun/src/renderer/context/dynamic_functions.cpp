@@ -5,17 +5,17 @@
 namespace
 {
 
-template <class Func>
-Func GetProcedure(const char *const name)
-{
-    const auto func = reinterpret_cast<Func>(vkGetDeviceProcAddr(estun::DeviceLocator::GetLogicalDevice(), name));
-    if (func == nullptr)
+    template <class Func>
+    Func GetProcedure(const char *const name)
     {
+        const auto func = reinterpret_cast<Func>(vkGetDeviceProcAddr(estun::DeviceLocator::GetLogicalDevice(), name));
+        if (func == nullptr)
+        {
             ES_CORE_ASSERT(std::string("failed to get address of '") + name + std::string("'"));
-    }
+        }
 
-    return func;
-}
+        return func;
+    }
 
 } // namespace
 
@@ -36,4 +36,4 @@ estun::DynamicFunctions::~DynamicFunctions()
 {
 }
 
-estun::DynamicFunctions* estun::FunctionsLocator::funcs_ = nullptr;
+estun::DynamicFunctions *estun::FunctionsLocator::funcs_ = nullptr;

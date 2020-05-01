@@ -23,6 +23,7 @@ namespace estun
             const std::string fragmentShaderName,
             std::unique_ptr<RenderPass> &renderPass,
             std::shared_ptr<Descriptor> descriptor,
+            VkSampleCountFlagBits msaa,
             bool isWireFrame);
         ~GraphicsPipeline();
 
@@ -37,6 +38,7 @@ namespace estun
 
     private:
         const bool isWireFrame_;
+        VkSampleCountFlagBits msaa_;
 
         VkPipeline pipeline_;
 
