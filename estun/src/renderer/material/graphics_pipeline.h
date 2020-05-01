@@ -43,6 +43,8 @@ namespace estun
         std::shared_ptr<Descriptor> descriptor_;
 
         std::vector<VkPipelineShaderStageCreateInfo> shaderStages_;
+        std::unique_ptr<ShaderModule> vertShaderModule_;
+        std::unique_ptr<ShaderModule> fragShaderModule_;
     };
 
 } // namespace estun

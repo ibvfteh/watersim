@@ -19,11 +19,11 @@ estun::GraphicsPipeline::GraphicsPipeline(
       descriptor_(descriptor)
 {
     // Load shaders.
-    const ShaderModule vertShaderModule(vertexShaderName);
-    const ShaderModule fragShaderModule(fragmentShaderName);
+    vertShaderModule_ = std::make_unique<ShaderModule>(vertexShaderName);
+    fragShaderModule_ = std::make_unique<ShaderModule>(fragmentShaderName);
 
-    shaderStages_.push_back(vertShaderModule.CreateShaderStage(VK_SHADER_STAGE_VERTEX_BIT));
-    shaderStages_.push_back(fragShaderModule.CreateShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT));
+    shaderStages_.push_back(vertShaderModule_->CreateShaderStage(VK_SHADER_STAGE_VERTEX_BIT));
+    shaderStages_.push_back(fragShaderModule_->CreateShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT));
 
     Create(renderPass);
 }
