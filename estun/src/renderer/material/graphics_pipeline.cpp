@@ -2,6 +2,7 @@
 #include "renderer/context/device.h"
 #include "renderer/buffers/vertex.h"
 #include "renderer/material/shader_manager.h"
+#include "renderer/material/shader_module.h"
 #include "renderer/context.h"
 #include "renderer/context/swap_chain.h"
 #include "renderer/context/render_pass.h"
@@ -11,9 +12,23 @@
 estun::GraphicsPipeline::GraphicsPipeline(
     const std::string vertexShaderName,
     const std::string fragmentShaderName,
-    RenderPass &renderPass,
-    const Descriptor &descriptor,
-    const bool isWireFrame) : wireFrame(isWireFrame)
+    std::unique_ptr<RenderPass> &renderPass,
+    std::shared_ptr<Descriptor> descriptor,
+    const bool isWireFrame)
+    : isWireFrame_(isWireFrame),
+      descriptor_(descriptor)
+{
+    // Load shaders.
+    const ShaderModule vertShaderModule(vertexShaderName);
+    const ShaderModule fragShaderModule(fragmentShaderName);
+
+    shaderStages_.push_back(vertShaderModule.CreateShaderStage(VK_SHADER_STAGE_VERTEX_BIT));
+    shaderStages_.push_back(fragShaderModule.CreateShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT));
+
+    Create(renderPass);
+}
+
+void estun::GraphicsPipeline::Create(std::unique_ptr<RenderPass> &renderPass)
 {
     const auto bindingDescription = Vertex::GetBindingDescription();
     const auto attributeDescriptions = Vertex::GetAttributeDescriptions();
@@ -53,7 +68,7 @@ estun::GraphicsPipeline::GraphicsPipeline(
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rasterizer.depthClampEnable = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
-    rasterizer.polygonMode = isWireFrame ? VK_POLYGON_MODE_LINE : VK_POLYGON_MODE_FILL;
+    rasterizer.polygonMode = isWireFrame_ ? VK_POLYGON_MODE_LINE : VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
@@ -104,29 +119,11 @@ estun::GraphicsPipeline::GraphicsPipeline(
     colorBlending.blendConstants[2] = 0.0f;
     colorBlending.blendConstants[3] = 0.0f;
 
-    // Load shaders.
-    VkShaderModule vertShaderModule = ShaderManager::GetInstance()->GetShaderModule(vertexShaderName);
-    VkShaderModule fragShaderModule = ShaderManager::GetInstance()->GetShaderModule(fragmentShaderName);
-
-    VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
-    vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vertShaderStageInfo.module = vertShaderModule;
-    vertShaderStageInfo.pName = "main";
-
-    VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
-    fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    fragShaderStageInfo.module = fragShaderModule;
-    fragShaderStageInfo.pName = "main";
-
-    VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
-
     // Create graphic pipeline
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = 2;
-    pipelineInfo.pStages = shaderStages;
+    pipelineInfo.pStages = shaderStages_.data();
     pipelineInfo.pVertexInputState = &vertexInputInfo;
     pipelineInfo.pInputAssemblyState = &inputAssembly;
     pipelineInfo.pViewportState = &viewportState;
@@ -137,23 +134,34 @@ estun::GraphicsPipeline::GraphicsPipeline(
     pipelineInfo.pDynamicState = nullptr;      // Optional
     pipelineInfo.basePipelineHandle = nullptr; // Optional
     pipelineInfo.basePipelineIndex = -1;       // Optional
-    pipelineInfo.layout = descriptor.GetPipelineLayout().GetPipelineLayout();
-    pipelineInfo.renderPass = renderPass.GetRenderPass();
+    pipelineInfo.layout = descriptor_->GetPipelineLayout().GetPipelineLayout();
+    pipelineInfo.renderPass = renderPass->GetRenderPass();
     pipelineInfo.subpass = 0;
 
-    VK_CHECK_RESULT(vkCreateGraphicsPipelines(DeviceLocator::GetLogicalDevice(), nullptr, 1, &pipelineInfo, nullptr, &pipeline), "Failed to create graphics pipeline");
+    VK_CHECK_RESULT(vkCreateGraphicsPipelines(DeviceLocator::GetLogicalDevice(), nullptr, 1, &pipelineInfo, nullptr, &pipeline_), "Failed to create graphics pipeline");
+}
+
+void estun::GraphicsPipeline::Destroy()
+{
+    if (pipeline_ != nullptr)
+    {
+        vkDestroyPipeline(DeviceLocator::GetLogicalDevice(), pipeline_, nullptr);
+        pipeline_ = nullptr;
+    }
+}
+
+void estun::GraphicsPipeline::Recreate(std::unique_ptr<RenderPass> &renderPass)
+{
+    Destroy();
+    Create(renderPass);
 }
 
 estun::GraphicsPipeline::~GraphicsPipeline()
 {
-    if (pipeline != nullptr)
-    {
-        vkDestroyPipeline(DeviceLocator::GetLogicalDevice(), pipeline, nullptr);
-        pipeline = nullptr;
-    }
+    Destroy();
 }
 
-void estun::GraphicsPipeline::Bind(VkCommandBuffer & commandBuffer)
+void estun::GraphicsPipeline::Bind(VkCommandBuffer &commandBuffer)
 {
-	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_);
 }

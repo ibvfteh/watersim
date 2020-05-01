@@ -66,7 +66,7 @@ estun::Window::Window(const WindowConfig& config) :
 	}
 
 	GLFWimage icon;
-	icon.pixels = stbi_load("../assets/textures/Vulkan.png", &icon.width, &icon.height, nullptr, 4);
+	icon.pixels = stbi_load(config_.icon.c_str(), &icon.width, &icon.height, nullptr, 4);
 	if (icon.pixels == nullptr)
 	{
 		ES_CORE_ASSERT("Failed to load icon");

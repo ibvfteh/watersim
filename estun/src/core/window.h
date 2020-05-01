@@ -15,6 +15,7 @@ struct WindowConfig
     std::string title;
     uint32_t width;
     uint32_t height;
+    std::string icon;
     bool cursorDisabled;
     bool fullscreen;
     bool resizable;
@@ -25,6 +26,7 @@ class Window
 public:
     Window(const Window &) = delete;
     Window(Window &&) = delete;
+    
     Window &operator=(const Window &) = delete;
     Window &operator=(Window &&) = delete;
 

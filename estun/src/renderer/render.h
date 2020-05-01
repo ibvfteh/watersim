@@ -23,67 +23,67 @@
 namespace estun
 {
 
-class Render
-{
-public:
-    Render(const Render &) = delete;
-    Render(Render &&) = delete;
+    class Render
+    {
+    public:
+        Render(const Render &) = delete;
+        Render(Render &&) = delete;
 
-    Render &operator=(const Render &) = delete;
-    Render &operator=(Render &&) = delete;
+        Render &operator=(const Render &) = delete;
+        Render &operator=(Render &&) = delete;
 
-    Render(bool toDefault = true);
-    ~Render();
+        Render(bool toDefault = true);
+        ~Render();
 
-    void CreateRender();
-    void DestroyRender();
-    void RecreateRender();
+        void Create();
+        void Destroy();
+        void Recreate();
 
-    std::shared_ptr<GraphicsPipeline> CreatePipeline(
-        const std::string vertexShaderName,
-        const std::string fragmentShaderName,
-        const std::shared_ptr<Descriptor> descriptor);
+        std::shared_ptr<GraphicsPipeline> CreatePipeline(
+            const std::string vertexShaderName,
+            const std::string fragmentShaderName,
+            const std::shared_ptr<Descriptor> descriptor);
 
-    void StartDrawInCurrent();
-    void RecordDrawInCurrent();
-    void Bind(std::shared_ptr<Descriptor> descriptor);
-    void Bind(std::shared_ptr<GraphicsPipeline> pipeline);
-    void Bind(std::shared_ptr<VertexBuffer> vertexBuffer);
-    void Bind(std::shared_ptr<IndexBuffer> indexBuffer);
-    void DrawIndexed(uint32_t indexesSize, uint32_t indexOffset, uint32_t vertexOffset);
+        void StartDrawInCurrent();
+        void RecordDrawInCurrent();
+        void Bind(std::shared_ptr<Descriptor> descriptor);
+        void Bind(std::shared_ptr<GraphicsPipeline> pipeline);
+        void Bind(std::shared_ptr<VertexBuffer> vertexBuffer);
+        void Bind(std::shared_ptr<IndexBuffer> indexBuffer);
+        void DrawIndexed(uint32_t indexesSize, uint32_t indexOffset, uint32_t vertexOffset);
 
-    //void CreateRayTracingOutputImage();
-    //void DeleteRayTracingOutputImage();
+        //void CreateRayTracingOutputImage();
+        //void DeleteRayTracingOutputImage();
 
-    VkCommandBuffer &GetCurrCommandBuffer();
-    RenderPass &GetRenderPass() { return *renderPass_; };
-    
-/*
+        VkCommandBuffer &GetCurrCommandBuffer();
+        RenderPass &GetRenderPass() { return *renderPass_; };
+
+        /*
     VkFramebuffer &GetFramebuffer(uint32_t index);
     ImageHolder *GetAccumulationImage();
     ImageHolder *GetOutputImage();
     */
 
-private:
-    bool toDefault_;
-    std::unique_ptr<CommandBuffers> commandBuffers_;
-    std::unique_ptr<ColorResources> colorResources_;
-    std::unique_ptr<DepthResources> depthResources_;
-    std::unique_ptr<ColorResources> colorResolveResources_;
-    std::unique_ptr<RenderPass> renderPass_;
-    std::vector<Framebuffer> framebuffers_;
+    private:
+        bool toDefault_;
+        std::unique_ptr<CommandBuffers> commandBuffers_;
+        std::unique_ptr<ColorResources> colorResources_;
+        std::unique_ptr<DepthResources> depthResources_;
+        std::unique_ptr<ColorResources> colorResolveResources_;
+        std::unique_ptr<RenderPass> renderPass_;
+        std::vector<Framebuffer> framebuffers_;
 
-    std::unique_ptr<ImageHolder> accumulationImage_;
-    std::unique_ptr<ImageHolder> outputImage_;
+        std::unique_ptr<ImageHolder> accumulationImage_;
+        std::unique_ptr<ImageHolder> outputImage_;
 
-    std::vector<std::shared_ptr<GraphicsPipeline>> pipelines_;
+        std::vector<std::shared_ptr<GraphicsPipeline>> pipelines_;
 
-    // TODO VK_POLYGON_MODE_LINE
-    // VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
+        // TODO VK_POLYGON_MODE_LINE
+        // VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
 
-    VkSampleCountFlagBits msaa_;
+        VkSampleCountFlagBits msaa_;
 
-    VkCommandBuffer currCommandBuffer_;
-};
+        VkCommandBuffer currCommandBuffer_;
+    };
 
 } // namespace estun

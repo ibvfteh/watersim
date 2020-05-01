@@ -4,15 +4,16 @@
 estun::Render::Render(bool toDefault)
     : toDefault_(toDefault)
 {
-    CreateRender();
+    Create();
 }
 
 estun::Render::~Render()
 {
-    DestroyRender();
+    pipelines_.clear();
+    Destroy();
 }
 
-void estun::Render::CreateRender()
+void estun::Render::Create()
 {
     auto msaa = ContextLocator::GetContext()->GetMsaaSamples();
     bool hasMsaa = msaa != VK_SAMPLE_COUNT_1_BIT;
@@ -66,9 +67,8 @@ void estun::Render::CreateRender()
     ES_CORE_INFO("Framebuffers done");
 }
 
-void estun::Render::DestroyRender()
+void estun::Render::Destroy()
 {
-    pipelines_.clear();
     framebuffers_.clear();
     renderPass_.reset();
     colorResolveResources_.reset();
@@ -77,10 +77,14 @@ void estun::Render::DestroyRender()
     commandBuffers_.reset();
 }
 
-void estun::Render::RecreateRender()
+void estun::Render::Recreate()
 {
-    DestroyRender();
-    CreateRender();
+    Destroy();
+    Create();
+    for (auto & pipeline : pipelines_)
+    {
+        pipeline->Recreate(renderPass_);
+    }
 }
 
 std::shared_ptr<estun::GraphicsPipeline> estun::Render::CreatePipeline(
@@ -88,7 +92,7 @@ std::shared_ptr<estun::GraphicsPipeline> estun::Render::CreatePipeline(
         const std::string fragmentShaderName,
         const std::shared_ptr<Descriptor> descriptor)
 {
-    std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(vertexShaderName, fragmentShaderName, *renderPass_, *descriptor, false);
+    std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(vertexShaderName, fragmentShaderName, renderPass_, descriptor, false);
     pipelines_.push_back(pipeline);
     return pipeline;
 }

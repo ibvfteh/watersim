@@ -55,6 +55,7 @@ public:
     void CreateSwapChain();
     void DeleteSwapChain();
     void RecreateSwapChain();
+    void Clear();
 
     void StartDraw();
     //void EndDraw();

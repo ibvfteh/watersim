@@ -44,6 +44,7 @@ estun::Context::~Context()
     computeCommandPool_.reset();
     graphicsCommandPool_.reset();
     device_.reset();
+    surface_->Delete(instance_.get());
     surface_.reset();
     instance_.reset();
 }
@@ -53,11 +54,6 @@ void estun::Context::CreateSwapChain()
     swapChain_.reset(new SwapChain(surface_.get(), gameInfo_->width_, gameInfo_->height_, gameInfo_->vsync_));
     ES_CORE_INFO("Swap chain done");
 
-    //colorResources_.reset(new ColorResources(swapChain_.get(), msaa_));
-    //ES_CORE_INFO("Color resources done");
-    //depthResources_.reset(new DepthResources(swapChain_->GetExtent(), msaa_));
-    //ES_CORE_INFO("Depth resources done");
-
     for (size_t i = 0; i != swapChain_->GetImageViews().size(); ++i)
     {
         imageAvailableSemaphores_.emplace_back();
@@ -65,20 +61,13 @@ void estun::Context::CreateSwapChain()
         inFlightFences_.emplace_back(true);
     }
     ES_CORE_INFO("Semaphores done");
-    //CreateRayTracingOutputImage();
-    ES_CORE_INFO("RayTracingImages done");
 }
 
 void estun::Context::DeleteSwapChain()
 {
-    renders_.clear();
-    //DeleteRayTracingOutputImage();
     inFlightFences_.clear();
     renderFinishedSemaphores_.clear();
     imageAvailableSemaphores_.clear();
-    //depthResources_.reset();
-    //colorResources_.reset();
-    //commandBuffers_.reset();
     swapChain_.reset();
 }
 
@@ -87,6 +76,17 @@ void estun::Context::RecreateSwapChain()
     device_->WaitIdle();
     DeleteSwapChain();
     CreateSwapChain();
+    for (auto & render : renders_)
+    {
+        render->Recreate();
+    }
+}
+
+void estun::Context::Clear()
+{
+    device_->WaitIdle();
+    renders_.clear();
+    DeleteSwapChain();
 }
 
 std::shared_ptr<estun::Render> estun::Context::CreateRender()

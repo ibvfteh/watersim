@@ -84,7 +84,7 @@ int main(int argc, const char **argv)
     };
 
     std::shared_ptr<estun::Descriptor> descriptor = std::make_shared<estun::Descriptor>(descriptorBindings, context->GetSwapChain()->GetImageViews().size());
-
+    descriptorBindings.clear();
     std::shared_ptr<estun::Render> render = context->CreateRender();
     std::shared_ptr<estun::GraphicsPipeline> pipeline = render->CreatePipeline("shaders/main.vert.spv", "shaders/main.frag.spv", descriptor);
 
@@ -111,6 +111,13 @@ int main(int argc, const char **argv)
 
     glfwDestroyWindow(window);
     glfwTerminate();
+    render.reset();
+    pipeline.reset();
+    context->Clear();
+    UBs.clear();
+    VB.reset();
+    IB.reset();
+    descriptor.reset();
     context.reset();
     return 0;
 }

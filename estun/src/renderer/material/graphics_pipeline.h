@@ -5,35 +5,44 @@
 namespace estun
 {
 
-class RenderPass;
-class Descriptor;
+    class RenderPass;
+    class Descriptor;
+    class ShaderModule;
 
-class GraphicsPipeline final
-{
-public:
-    GraphicsPipeline(const GraphicsPipeline &) = delete;
-    GraphicsPipeline(GraphicsPipeline &&) = delete;
+    class GraphicsPipeline
+    {
+    public:
+        GraphicsPipeline(const GraphicsPipeline &) = delete;
+        GraphicsPipeline(GraphicsPipeline &&) = delete;
 
-    GraphicsPipeline &operator=(const GraphicsPipeline &) = delete;
-    GraphicsPipeline &operator=(GraphicsPipeline &&) = delete;
+        GraphicsPipeline &operator=(const GraphicsPipeline &) = delete;
+        GraphicsPipeline &operator=(GraphicsPipeline &&) = delete;
 
-    GraphicsPipeline(
-        const std::string vertexShaderName,
-        const std::string fragmentShaderName,
-        RenderPass &renderPass,
-        const Descriptor &descriptor,
-        bool isWireFrame);
-    ~GraphicsPipeline();
+        GraphicsPipeline(
+            const std::string vertexShaderName,
+            const std::string fragmentShaderName,
+            std::unique_ptr<RenderPass> &renderPass,
+            std::shared_ptr<Descriptor> descriptor,
+            bool isWireFrame);
+        ~GraphicsPipeline();
 
-    void Bind(VkCommandBuffer & commandBuffer);
+        void Create(std::unique_ptr<RenderPass> &renderPass);
+        void Destroy();
+        void Recreate(std::unique_ptr<RenderPass> &renderPass);
 
-    VkDescriptorSet GetDescriptorSet(uint32_t index) const;
-    bool IsWireFrame() const { return wireFrame; }
+        void Bind(VkCommandBuffer &commandBuffer);
 
-private:
-    const bool wireFrame;
+        VkDescriptorSet GetDescriptorSet(uint32_t index) const;
+        bool IsWireFrame() const { return isWireFrame_; }
 
-    VkPipeline pipeline;
-};
+    private:
+        const bool isWireFrame_;
+
+        VkPipeline pipeline_;
+
+        std::shared_ptr<Descriptor> descriptor_;
+
+        std::vector<VkPipelineShaderStageCreateInfo> shaderStages_;
+    };
 
 } // namespace estun
