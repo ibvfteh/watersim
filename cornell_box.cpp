@@ -4,9 +4,9 @@ namespace
 {
 	void AddTriangle(std::vector<uint32_t>& indices, const uint32_t offset, const uint32_t i0, const uint32_t i1, const uint32_t i2)
 	{
-		indices.push_back(offset + i2);
-		indices.push_back(offset + i1);
 		indices.push_back(offset + i0);
+		indices.push_back(offset + i1);
+		indices.push_back(offset + i2);
 	}
 }
 

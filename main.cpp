@@ -62,11 +62,8 @@ int main(int argc, const char **argv)
 
     std::shared_ptr<estun::VertexBuffer> VB = std::make_shared<estun::VertexBuffer>(model.GetVertices());
     std::shared_ptr<estun::IndexBuffer> IB = std::make_shared<estun::IndexBuffer>(model.GetIndices());
-    std::shared_ptr<estun::AccelerationStructureManager> ASM = std::make_shared<estun::AccelerationStructureManager>();
-	//std::vector<estun::Material> materials;
-    //materials.push_back(estun::Material::Lambertian(glm::vec3(0.65f, 0.05f, 0.05f)));
-
-    ASM->Submit(std::vector<estun::Model>{model}, VB.get(), IB.get(), false);
+    //std::shared_ptr<estun::AccelerationStructureManager> ASM = std::make_shared<estun::AccelerationStructureManager>();
+    //ASM->Submit(std::vector<estun::Model>{model}, VB.get(), IB.get(), false);
 
     std::vector<estun::DescriptorBinding> descriptorBindings = {
         estun::DescriptorBinding::Uniform(0, UBs, VK_SHADER_STAGE_VERTEX_BIT)
@@ -92,7 +89,7 @@ int main(int argc, const char **argv)
         render->RecordDrawInCurrent();
 
         ubo.view = camera.GetViewMatrix();
-        ubo.projection = glm::perspective(glm::radians(camera.Zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 10000.0f);
+        ubo.projection = glm::perspective(glm::radians(camera.Zoom), (float)info.width_ / (float)info.height_, 0.1f, 10000.0f);
         UBs[context->GetImageIndex()].SetValue(ubo);
 
         context->SubmitDraw();
