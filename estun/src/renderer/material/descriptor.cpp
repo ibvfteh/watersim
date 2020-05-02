@@ -29,16 +29,20 @@ estun::Descriptor::Descriptor(const std::vector<DescriptorBinding> &descriptorBi
     for (int index = 0; index < maxSets; index++)
     {
         std::vector<VkWriteDescriptorSet> descriptorWrites;
+        std::vector<DescriptableInfo> infos;
+        uint32_t size = 0;
+        for (int binding = 0; binding < descriptorBindings.size(); binding++)
+        {
+            size += descriptorBindings[binding].descriptable_.size();
+        }
+        infos.reserve(size);
 
         for (int binding = 0; binding < descriptorBindings.size(); binding++)
         {
             for (int j = 0; j < descriptorBindings[binding].descriptable_.size(); j++)
             {
-                DescriptableInfo info = descriptorBindings[binding].descriptable_[j]->GetInfo();
-                if (info.bI.has_value())
-                {
-                    descriptorWrites.push_back(descriptorSets->Bind(index, descriptorBindings[binding].binding_, info));
-                }
+                infos.push_back(descriptorBindings[binding].descriptable_[j]->GetInfo());
+                descriptorWrites.push_back(descriptorSets->Bind(index, descriptorBindings[binding].binding_, infos.back()));
             }
         }
         descriptorSets->UpdateDescriptors(index, descriptorWrites);
@@ -70,7 +74,7 @@ estun::PipelineLayout &estun::Descriptor::GetPipelineLayout() const
     return *pipelineLayout;
 }
 
-void estun::Descriptor::Bind(VkCommandBuffer & commandBuffer)
+void estun::Descriptor::Bind(VkCommandBuffer &commandBuffer)
 {
     VkDescriptorSet vkDescriptorSets[] = {descriptorSets->GetDescriptorSet(ContextLocator::GetImageIndex())};
     vkCmdBindDescriptorSets(

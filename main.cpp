@@ -62,11 +62,13 @@ int main(int argc, const char **argv)
 
     std::shared_ptr<estun::VertexBuffer> VB = std::make_shared<estun::VertexBuffer>(model.GetVertices());
     std::shared_ptr<estun::IndexBuffer> IB = std::make_shared<estun::IndexBuffer>(model.GetIndices());
+    std::shared_ptr<estun::StorageBuffer<estun::Material>> materialBuffer = std::make_shared<estun::StorageBuffer<estun::Material>>(model.GetMaterials());
     //std::shared_ptr<estun::AccelerationStructureManager> ASM = std::make_shared<estun::AccelerationStructureManager>();
     //ASM->Submit(std::vector<estun::Model>{model}, VB.get(), IB.get(), false);
 
     std::vector<estun::DescriptorBinding> descriptorBindings = {
-        estun::DescriptorBinding::Uniform(0, UBs, VK_SHADER_STAGE_VERTEX_BIT)
+        estun::DescriptorBinding::Uniform(0, UBs, VK_SHADER_STAGE_VERTEX_BIT),
+        estun::DescriptorBinding::Storage(1, materialBuffer, VK_SHADER_STAGE_FRAGMENT_BIT)
     };
 
     std::shared_ptr<estun::Descriptor> descriptor = std::make_shared<estun::Descriptor>(descriptorBindings, context->GetSwapChain()->GetImageViews().size());
@@ -103,6 +105,7 @@ int main(int argc, const char **argv)
     UBs.clear();
     VB.reset();
     IB.reset();
+    materialBuffer.reset();
     descriptor.reset();
     context.reset();
     return 0;

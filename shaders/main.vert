@@ -14,9 +14,11 @@ layout(location = 3) in int inMaterial;
 
 layout(location = 0) out vec3 fragNormal;
 layout(location = 1) out vec2 fragTexCoord;
+layout(location = 2) out int fragMaterial;
 
 void main() {
     gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
     fragNormal = inNormal;
     fragTexCoord = inTexCoord;
+    fragMaterial = inMaterial;
 }

@@ -47,9 +47,9 @@ struct DescriptorBinding
     }
 
     template <class T>
-    static DescriptorBinding Storage(uint32_t binding, StorageBuffer<T> &storageBuffer, VkShaderStageFlags stage)
+    static DescriptorBinding Storage(uint32_t binding, std::shared_ptr<StorageBuffer<T>> storageBuffer, VkShaderStageFlags stage)
     {
-        std::vector<Descriptable*> descriptables = {&storageBuffer};
+        std::vector<Descriptable*> descriptables = {storageBuffer.get()};
         return DescriptorBinding(binding, descriptables, 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, stage);
     }
 
