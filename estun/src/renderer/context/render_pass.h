@@ -19,7 +19,7 @@ public:
     RenderPass &operator=(const RenderPass &) = delete;
     RenderPass &operator=(RenderPass &&) = delete;
 
-    RenderPass(bool msaa);
+    RenderPass(bool msaa, VkImageLayout colorFinal = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VkImageLayout depthFinal = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
     ~RenderPass();
 
     void Begin(Framebuffer &farmebuffer, VkCommandBuffer &commandBuffer);

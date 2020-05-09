@@ -13,7 +13,8 @@
 #include "renderer/material/descriptor.h"
 #include "renderer/buffers/storage_buffer.h"
 #include "renderer/model.h"
-//#include "renderer/ray_tracing/ShaderBildingTable.h"
+#include "renderer/ray_tracing/ray_tracing_pipeline.h"
+#include "renderer/ray_tracing/shader_bilding_table.h"
 #include "renderer/buffers/buffer.h"
 #include "renderer/context/image.h"
 #include "renderer/context/image_view.h"
@@ -44,6 +45,10 @@ namespace estun
             const std::string fragmentShaderName,
             const std::shared_ptr<Descriptor> descriptor);
 
+        std::shared_ptr<estun::RayTracingPipeline> CreateRTPipeline(
+            const std::vector<std::string> shaderNames,
+            const std::shared_ptr<Descriptor> descriptor);
+
         void StartDrawInCurrent();
         void RecordDrawInCurrent();
         void Bind(std::shared_ptr<Descriptor> descriptor);
@@ -52,8 +57,8 @@ namespace estun
         void Bind(std::shared_ptr<IndexBuffer> indexBuffer);
         void DrawIndexed(uint32_t indexesSize, uint32_t indexOffset, uint32_t vertexOffset);
 
-        //void CreateRayTracingOutputImage();
-        //void DeleteRayTracingOutputImage();
+        void CreateRayTracingOutputImage();
+        void DeleteRayTracingOutputImage();
 
         VkCommandBuffer &GetCurrCommandBuffer();
         RenderPass &GetRenderPass() { return *renderPass_; };
@@ -75,7 +80,7 @@ namespace estun
 
         std::unique_ptr<ImageHolder> accumulationImage_;
         std::unique_ptr<ImageHolder> outputImage_;
-
+        std::vector<std::shared_ptr<RayTracingPipeline>> rtpipelines_;
         std::vector<std::shared_ptr<GraphicsPipeline>> pipelines_;
 
         // TODO VK_POLYGON_MODE_LINE

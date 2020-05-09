@@ -4,7 +4,7 @@
 #include "renderer/context.h"
 #include "renderer/context/framebuffer.h"
 
-estun::RenderPass::RenderPass(bool msaa)
+estun::RenderPass::RenderPass(bool msaa, VkImageLayout colorFinal, VkImageLayout depthFinal)
 {
     ContextLocator::GetContext();
     VkAttachmentDescription colorAttachment = {};
@@ -21,7 +21,7 @@ estun::RenderPass::RenderPass(bool msaa)
     }
     else
     {
-        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        colorAttachment.finalLayout = colorFinal;
     }
 
     VkAttachmentDescription depthAttachment = {};
@@ -32,7 +32,7 @@ estun::RenderPass::RenderPass(bool msaa)
     depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    depthAttachment.finalLayout = depthFinal;
 
     VkAttachmentReference colorAttachmentRef = {};
     colorAttachmentRef.attachment = 0;
@@ -68,7 +68,7 @@ estun::RenderPass::RenderPass(bool msaa)
         colorAttachmentResolve.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         colorAttachmentResolve.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         colorAttachmentResolve.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        colorAttachmentResolve.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        colorAttachmentResolve.finalLayout = colorFinal;
 
         VkAttachmentReference colorAttachmentResolveRef = {};
         colorAttachmentResolveRef.attachment = 2;

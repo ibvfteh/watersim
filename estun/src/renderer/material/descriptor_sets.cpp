@@ -82,7 +82,6 @@ VkWriteDescriptorSet estun::DescriptorSets::Bind(const uint32_t index, const uin
 
 void estun::DescriptorSets::UpdateDescriptors(uint32_t index, const std::vector<VkWriteDescriptorSet> &descriptorWrites)
 {
-	ES_CORE_INFO("update");
 	vkUpdateDescriptorSets(
 		DeviceLocator::GetLogicalDevice(),
 		static_cast<uint32_t>(descriptorWrites.size()),

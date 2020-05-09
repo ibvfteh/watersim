@@ -5,38 +5,37 @@
 namespace estun
 {
 
-struct MemoryRequirements
-{
-    VkMemoryRequirements result;
-    VkMemoryRequirements build;
-    VkMemoryRequirements update;
-};
+    class BaseAccelerationStructure
+    {
+    public:
+        struct MemoryRequirements
+        {
+            VkMemoryRequirements result;
+            VkMemoryRequirements build;
+            VkMemoryRequirements update;
+        };
 
-class BaseAccelerationStructure
-{
-public:
-    BaseAccelerationStructure(const BaseAccelerationStructure &) = delete;
-    BaseAccelerationStructure(BaseAccelerationStructure &&other) noexcept;
-    
-    BaseAccelerationStructure &operator=(const BaseAccelerationStructure &) = delete;
-    BaseAccelerationStructure &operator=(BaseAccelerationStructure &&) = delete;
+        BaseAccelerationStructure(const BaseAccelerationStructure &) = delete;
+        BaseAccelerationStructure(BaseAccelerationStructure &&other) noexcept;
 
+        BaseAccelerationStructure &operator=(const BaseAccelerationStructure &) = delete;
+        BaseAccelerationStructure &operator=(BaseAccelerationStructure &&) = delete;
 
-    virtual ~BaseAccelerationStructure();
+        virtual ~BaseAccelerationStructure();
 
-    MemoryRequirements GetMemoryRequirements() const;
+        MemoryRequirements GetMemoryRequirements() const;
 
-    static void ASMemoryBarrier(VkCommandBuffer commandBuffer);
+        static void ASMemoryBarrier(VkCommandBuffer commandBuffer);
 
-    VkAccelerationStructureKHR GetStructure() const;
+        VkAccelerationStructureNV GetStructure() const;
 
-protected:
-    BaseAccelerationStructure(const VkAccelerationStructureCreateInfoKHR &createInfo);
+    protected:
+        BaseAccelerationStructure(const VkAccelerationStructureCreateInfoNV &createInfo);
 
-    const bool allowUpdate_;
+        const bool allowUpdate_;
 
-private:
-    VkAccelerationStructureKHR accelerationStructure_;
-};
+    private:
+        VkAccelerationStructureNV accelerationStructure_;
+    };
 
 } // namespace estun

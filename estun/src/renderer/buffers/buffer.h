@@ -42,6 +42,8 @@ public:
 
 		stagingBuffer.reset();
 	}
+	
+    static void BufferMemoryBarrier(VkCommandBuffer commandBuffer, const Buffer &buffer, bool type);
 
 	VkBuffer GetBuffer() const;
 

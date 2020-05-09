@@ -20,7 +20,8 @@ estun::DeviceMemory::DeviceMemory(
 	}
 	allocInfo.memoryTypeIndex = FindMemoryType(memoryTypeBits, properties);
 
-	VK_CHECK_RESULT(vkAllocateMemory(DeviceLocator::GetLogicalDevice(), &allocInfo, nullptr, &memory), "Failed to allocate memory");
+	auto rres = vkAllocateMemory(DeviceLocator::GetLogicalDevice(), &allocInfo, nullptr, &memory);
+	VK_CHECK_RESULT(rres, "Failed to allocate memory");
 }
 
 estun::DeviceMemory::DeviceMemory(DeviceMemory&& other) noexcept :

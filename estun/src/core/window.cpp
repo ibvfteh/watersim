@@ -6,41 +6,58 @@
 
 namespace
 {
-	void GlfwErrorCallback(const int error, const char* const description)
+	void GlfwErrorCallback(const int error, const char *const description)
 	{
-		ES_CORE_ASSERT(std::string("ERROR: GLFW: ") + std::string(description) + " (code: " + std::to_string(error) + ")" );
+		ES_CORE_ASSERT(std::string("ERROR: GLFW: ") + std::string(description) + " (code: " + std::to_string(error) + ")");
 	}
 
-	void GlfwKeyCallback(GLFWwindow* window, const int key, const int scancode, const int action, const int mods)
+	void GlfwKeyCallback(GLFWwindow *window, const int key, const int scancode, const int action, const int mods)
 	{
-		const auto this_ = reinterpret_cast<estun::Window*>(glfwGetWindowUserPointer(window));
+		const auto this_ = reinterpret_cast<estun::Window *>(glfwGetWindowUserPointer(window));
 		if (this_->OnKey)
 		{
 			this_->OnKey(key, scancode, action, mods);
 		}
 	}
 
-	void GlfwCursorPositionCallback(GLFWwindow* window, const double xpos, const double ypos)
+	void GlfwCursorPositionCallback(GLFWwindow *window, const double xpos, const double ypos)
 	{
-		const auto this_ = reinterpret_cast<estun::Window*>(glfwGetWindowUserPointer(window));
+		const auto this_ = reinterpret_cast<estun::Window *>(glfwGetWindowUserPointer(window));
 		if (this_->OnCursorPosition)
 		{
 			this_->OnCursorPosition(xpos, ypos);
 		}
 	}
 
-	void GlfwMouseButtonCallback(GLFWwindow* window, const int button, const int action, const int mods)
+	void GlfwScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 	{
-		const auto this_ = reinterpret_cast<estun::Window*>(glfwGetWindowUserPointer(window));
+		const auto this_ = reinterpret_cast<estun::Window *>(glfwGetWindowUserPointer(window));
+		if (this_->OnScroll)
+		{
+			this_->OnScroll(xoffset, yoffset);
+		}
+	}
+
+	void GlfwMouseButtonCallback(GLFWwindow *window, const int button, const int action, const int mods)
+	{
+		const auto this_ = reinterpret_cast<estun::Window *>(glfwGetWindowUserPointer(window));
 		if (this_->OnMouseButton)
 		{
 			this_->OnMouseButton(button, action, mods);
 		}
 	}
-}
 
-estun::Window::Window(const WindowConfig& config) :
-	config_(config)
+	void GlfwFramebufferResizeCallback(GLFWwindow *window, int width, int height)
+	{
+		const auto this_ = reinterpret_cast<estun::Window *>(glfwGetWindowUserPointer(window));
+		if (this_->OnResize)
+		{
+			this_->OnResize(width, height);
+		}
+	}
+} // namespace
+
+estun::Window::Window(const WindowConfig &config) : config_(config)
 {
 	glfwSetErrorCallback(GlfwErrorCallback);
 
@@ -84,6 +101,8 @@ estun::Window::Window(const WindowConfig& config) :
 	glfwSetKeyCallback(window_, GlfwKeyCallback);
 	glfwSetCursorPosCallback(window_, GlfwCursorPositionCallback);
 	glfwSetMouseButtonCallback(window_, GlfwMouseButtonCallback);
+	glfwSetMouseButtonCallback(window_, GlfwMouseButtonCallback);
+	glfwSetMouseButtonCallback(window_, GlfwMouseButtonCallback);
 }
 
 estun::Window::~Window()
@@ -98,11 +117,11 @@ estun::Window::~Window()
 	glfwSetErrorCallback(nullptr);
 }
 
-std::vector<const char*> estun::Window::GetRequiredInstanceExtensions() const
+std::vector<const char *> estun::Window::GetRequiredInstanceExtensions() const
 {
 	uint32_t glfwExtensionCount = 0;
-	const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-	return std::vector<const char*>(glfwExtensions, glfwExtensions + glfwExtensionCount);
+	const char **glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+	return std::vector<const char *>(glfwExtensions, glfwExtensions + glfwExtensionCount);
 }
 
 float estun::Window::ContentScale() const
@@ -123,14 +142,14 @@ VkExtent2D estun::Window::FramebufferSize() const
 {
 	int width, height;
 	glfwGetFramebufferSize(window_, &width, &height);
-	return VkExtent2D{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+	return VkExtent2D{static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
 }
 
 VkExtent2D estun::Window::WindowSize() const
 {
 	int width, height;
 	glfwGetWindowSize(window_, &width, &height);
-	return VkExtent2D{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+	return VkExtent2D{static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
 }
 
 void estun::Window::Close() const
@@ -162,4 +181,12 @@ void estun::Window::Run() const
 void estun::Window::WaitForEvents() const
 {
 	glfwWaitEvents();
+}
+
+void estun::Window::ToggleCursor(bool cursor) const
+{
+	if (cursor)
+		glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	else
+		glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }

@@ -19,49 +19,74 @@ namespace estun
 
         const std::function<VkResult(
             VkDevice device,
-            const VkAccelerationStructureCreateInfoKHR *pCreateInfo,
+            const VkAccelerationStructureCreateInfoNV *pCreateInfo,
             const VkAllocationCallbacks *pAllocator,
-            VkAccelerationStructureKHR *pAccelerationStructure)>
-            vkCreateAccelerationStructureKHR;
+            VkAccelerationStructureNV *pAccelerationStructure)>
+            vkCreateAccelerationStructureNV;
 
         const std::function<void(
             VkDevice device,
-            VkAccelerationStructureKHR accelerationStructure,
+            VkAccelerationStructureNV accelerationStructure,
             const VkAllocationCallbacks *pAllocator)>
-            vkDestroyAccelerationStructureKHR;
+            vkDestroyAccelerationStructureNV;
 
         const std::function<void(
             VkDevice device,
-            const VkAccelerationStructureMemoryRequirementsInfoKHR *pInfo,
-            VkMemoryRequirements2 *pMemoryRequirements)>
-            vkGetAccelerationStructureMemoryRequirementsKHR;
+            const VkAccelerationStructureMemoryRequirementsInfoNV *pInfo,
+            VkMemoryRequirements2KHR *pMemoryRequirements)>
+            vkGetAccelerationStructureMemoryRequirementsNV;
 
         const std::function<VkResult(
             VkDevice device,
             uint32_t bindInfoCount,
-            const VkBindAccelerationStructureMemoryInfoKHR *pBindInfos)>
-            vkBindAccelerationStructureMemoryKHR;
+            const VkBindAccelerationStructureMemoryInfoNV *pBindInfos)>
+            vkBindAccelerationStructureMemoryNV;
 
         const std::function<void(
             VkCommandBuffer commandBuffer,
-            uint32_t infoCount,
-            const VkAccelerationStructureBuildGeometryInfoKHR *pInfos,
-            const VkAccelerationStructureBuildOffsetInfoKHR *const *ppOffsetInfos)>
-            vkCmdBuildAccelerationStructureKHR;
+            const VkAccelerationStructureInfoNV *pInfo,
+            VkBuffer instanceData,
+            VkDeviceSize instanceOffset,
+            VkBool32 update,
+            VkAccelerationStructureNV dst,
+            VkAccelerationStructureNV src,
+            VkBuffer scratch,
+            VkDeviceSize scratchOffset)>
+            vkCmdBuildAccelerationStructureNV;
 
-        const std::function<VkDeviceAddress(
-            VkDevice device,
-            const VkAccelerationStructureDeviceAddressInfoKHR *pInfo)>
-            vkGetAccelerationStructureDeviceAddressKHR;
+        const std::function<void(
+            VkCommandBuffer commandBuffer,
+            VkAccelerationStructureNV dst,
+            VkAccelerationStructureNV src,
+            VkCopyAccelerationStructureModeNV mode)>
+            vkCmdCopyAccelerationStructureNV;
+
+        const std::function<void(
+            VkCommandBuffer commandBuffer,
+            VkBuffer raygenShaderBindingTableBuffer,
+            VkDeviceSize raygenShaderBindingOffset,
+            VkBuffer missShaderBindingTableBuffer,
+            VkDeviceSize missShaderBindingOffset,
+            VkDeviceSize missShaderBindingStride,
+            VkBuffer hitShaderBindingTableBuffer,
+            VkDeviceSize hitShaderBindingOffset,
+            VkDeviceSize hitShaderBindingStride,
+            VkBuffer callableShaderBindingTableBuffer,
+            VkDeviceSize callableShaderBindingOffset,
+            VkDeviceSize callableShaderBindingStride,
+            uint32_t width,
+            uint32_t height,
+            uint32_t depth)>
+            vkCmdTraceRaysNV;
 
         const std::function<VkResult(
             VkDevice device,
             VkPipelineCache pipelineCache,
             uint32_t createInfoCount,
-            const VkRayTracingPipelineCreateInfoKHR *pCreateInfos,
+            const VkRayTracingPipelineCreateInfoNV *pCreateInfos,
             const VkAllocationCallbacks *pAllocator,
             VkPipeline *pPipelines)>
-            vkCreateRayTracingPipelinesKHR;
+            vkCreateRayTracingPipelinesNV;
 
         const std::function<VkResult(
             VkDevice device,
@@ -70,18 +95,29 @@ namespace estun
             uint32_t groupCount,
             size_t dataSize,
             void *pData)>
-            vkGetRayTracingShaderGroupHandlesKHR;
+            vkGetRayTracingShaderGroupHandlesNV;
+
+        const std::function<VkResult(
+            VkDevice device,
+            VkAccelerationStructureNV accelerationStructure,
+            size_t dataSize,
+            void *pData)>
+            vkGetAccelerationStructureHandleNV;
 
         const std::function<void(
             VkCommandBuffer commandBuffer,
-            const VkStridedBufferRegionKHR *pRaygenShaderBindingTable,
-            const VkStridedBufferRegionKHR *pMissShaderBindingTable,
-            const VkStridedBufferRegionKHR *pHitShaderBindingTable,
-            const VkStridedBufferRegionKHR *pCallableShaderBindingTable,
-            uint32_t width,
-            uint32_t height,
-            uint32_t depth)>
-            vkCmdTraceRaysKHR;
+            uint32_t accelerationStructureCount,
+            const VkAccelerationStructureNV *pAccelerationStructures,
+            VkQueryType queryType,
+            VkQueryPool queryPool,
+            uint32_t firstQuery)>
+            vkCmdWriteAccelerationStructuresPropertiesNV;
+
+        const std::function<VkResult(
+            VkDevice device,
+            VkPipeline pipeline,
+            uint32_t shader)>
+            vkCompileDeferredNV;
     };
 
     class FunctionsLocator

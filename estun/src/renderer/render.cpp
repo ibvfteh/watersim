@@ -29,7 +29,7 @@ void estun::Render::Create()
     commandBuffers_.reset(new CommandBuffers(CommandPoolLocator::GetGraphicsPool(), size));
     ES_CORE_INFO("Command buffers done");
 
-    colorResources_.reset(new ColorResources(ContextLocator::GetSwapChain()->GetExtent(), msaa));
+    colorResources_.reset(new ColorResources(ContextLocator::GetSwapChain()->GetExtent(), VK_SAMPLE_COUNT_1_BIT));
     ES_CORE_INFO("Color resources done");
 
     depthResources_.reset(new DepthResources(ContextLocator::GetSwapChain()->GetExtent(), msaa));
@@ -41,34 +41,59 @@ void estun::Render::Create()
         ES_CORE_INFO("Color resolve resources done");
     }
 
-    renderPass_.reset(new RenderPass(hasMsaa));
+    if (toDefault_)
+    {
+        renderPass_.reset(new RenderPass(hasMsaa));
+    }
+    else
+    {
+        renderPass_.reset(new RenderPass(hasMsaa, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+    }
+
     ES_CORE_INFO("Render pass done");
 
     for (int i = 0; i < size; i++)
     {
         std::vector<ImageView *> attachments;
-        if (toDefault_)
-        {
-            attachments.push_back(ContextLocator::GetSwapChain()->GetImageViews()[i].get());
-        }
-        else
-        {
-            attachments.push_back(colorResources_->GetImageView().get());
-        }
-        attachments.push_back(depthResources_->GetImageView().get());
 
         if (hasMsaa)
         {
             attachments.push_back(colorResolveResources_->GetImageView().get());
         }
+        else
+        {
+            if (toDefault_)
+            {
+                attachments.push_back(ContextLocator::GetSwapChain()->GetImageViews()[i].get());
+            }
+            else
+            {
+                attachments.push_back(colorResources_->GetImageView().get());
+            }
+        }
+        attachments.push_back(depthResources_->GetImageView().get());
+        if (hasMsaa)
+        {
+            if (toDefault_)
+            {
+                attachments.push_back(ContextLocator::GetSwapChain()->GetImageViews()[i].get());
+            }
+            else
+            {
+                attachments.push_back(colorResources_->GetImageView().get());
+            }
+        }
 
         framebuffers_.push_back(Framebuffer(attachments, renderPass_));
     }
     ES_CORE_INFO("Framebuffers done");
+    CreateRayTracingOutputImage();
+    ES_CORE_INFO("Ray-tracing images done");
 }
 
 void estun::Render::Destroy()
 {
+    DeleteRayTracingOutputImage();
     framebuffers_.clear();
     renderPass_.reset();
     colorResolveResources_.reset();
@@ -81,22 +106,31 @@ void estun::Render::Recreate()
 {
     Destroy();
     Create();
-    for (auto & pipeline : pipelines_)
+    for (auto &pipeline : pipelines_)
     {
         pipeline->Recreate(renderPass_);
     }
 }
 
 std::shared_ptr<estun::GraphicsPipeline> estun::Render::CreatePipeline(
-        const std::string vertexShaderName,
-        const std::string fragmentShaderName,
-        const std::shared_ptr<Descriptor> descriptor)
+    const std::string vertexShaderName,
+    const std::string fragmentShaderName,
+    const std::shared_ptr<Descriptor> descriptor)
 {
-    std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(vertexShaderName, fragmentShaderName, renderPass_, descriptor,  ContextLocator::GetContext()->GetMsaaSamples(), false);
+    std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(vertexShaderName, fragmentShaderName, renderPass_, descriptor, ContextLocator::GetContext()->GetMsaaSamples(), false);
     pipelines_.push_back(pipeline);
     return pipeline;
 }
-
+/*
+std::shared_ptr<estun::RayTracingPipeline> estun::Render::CreateRTPipeline(
+    const std::vector<std::string> shaderNames,
+    const std::shared_ptr<Descriptor> descriptor)
+{
+    std::shared_ptr<RayTracingPipeline> rtpipeline = std::make_shared<RayTracingPipeline>(shaderNames, descriptor);
+    rtpipelines_.push_back(rtpipeline);
+    return rtpipeline;
+}
+*/
 void estun::Render::StartDrawInCurrent()
 {
     commandBuffers_->Begin(ContextLocator::GetImageIndex());
@@ -127,6 +161,31 @@ void estun::Render::Bind(std::shared_ptr<VertexBuffer> vertexBuffer)
 void estun::Render::Bind(std::shared_ptr<IndexBuffer> indexBuffer)
 {
     indexBuffer->Bind(GetCurrCommandBuffer());
+}
+
+void estun::Render::CreateRayTracingOutputImage()
+{
+    const auto extent = ContextLocator::GetSwapChain()->GetExtent();
+    const auto format = ContextLocator::GetSwapChain()->GetFormat();
+    const auto tiling = VK_IMAGE_TILING_OPTIMAL;
+
+    accumulationImage_.reset(
+        new ImageHolder(
+            extent.width, extent.height,
+            VK_SAMPLE_COUNT_1_BIT, VK_FORMAT_R32G32B32A32_SFLOAT, VK_IMAGE_TILING_OPTIMAL,
+            VK_IMAGE_USAGE_STORAGE_BIT, VK_IMAGE_ASPECT_COLOR_BIT));
+
+    outputImage_.reset(
+        new ImageHolder(
+            extent.width, extent.height,
+            VK_SAMPLE_COUNT_1_BIT, format, tiling,
+            VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_IMAGE_ASPECT_COLOR_BIT));
+}
+
+void estun::Render::DeleteRayTracingOutputImage()
+{
+    accumulationImage_.reset();
+    outputImage_.reset();
 }
 
 VkCommandBuffer &estun::Render::GetCurrCommandBuffer()

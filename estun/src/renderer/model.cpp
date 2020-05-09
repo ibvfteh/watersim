@@ -70,7 +70,6 @@ estun::Model estun::Model::LoadModel(const std::string &filename)
         for (const auto &index : mesh.indices)
         {
             Vertex vertex = {};
-
             vertex.position =
                 {
                     objAttrib.vertices[3 * index.vertex_index + 0],
@@ -92,7 +91,7 @@ estun::Model estun::Model::LoadModel(const std::string &filename)
                         1 - objAttrib.texcoords[2 * index.texcoord_index + 1]};
             }
 
-            vertex.materialIndex = std::max(0, mesh.material_ids[faceId++ / 3]);
+            //vertex.materialIndex = std::max(0, mesh.material_ids[faceId++ / 3]);
 
             if (uniqueVertices.count(vertex) == 0)
             {

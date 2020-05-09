@@ -7,6 +7,7 @@
 #include "renderer/buffers/buffer.h"
 #include "renderer/material/descriptable.h"
 #include "renderer/buffers/vertex.h"
+#include "renderer/model.h"
 
 namespace estun
 {

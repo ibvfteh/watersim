@@ -86,7 +86,7 @@ VkMemoryRequirements estun::Image::GetMemoryRequirements() const
 void estun::Image::TransitionImageLayout(const VkImageLayout &newLayout)
 {
 
-    SingleTimeCommands::SubmitTransfer(CommandPoolLocator::GetTransferPool(), [&](VkCommandBuffer commandBuffer) 
+    SingleTimeCommands::SubmitGraphics(CommandPoolLocator::GetGraphicsPool(), [&](VkCommandBuffer commandBuffer) 
     {
         VkImageMemoryBarrier barrier = {};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -154,7 +154,7 @@ void estun::Image::TransitionImageLayout(const VkImageLayout &newLayout)
 
 void estun::Image::CopyFrom(const Buffer &buffer)
 {
-    SingleTimeCommands::SubmitTransfer(CommandPoolLocator::GetTransferPool(), [&](VkCommandBuffer commandBuffer) 
+    SingleTimeCommands::SubmitGraphics(CommandPoolLocator::GetGraphicsPool(), [&](VkCommandBuffer commandBuffer) 
     {
         VkBufferImageCopy region = {};
         region.bufferOffset = 0;

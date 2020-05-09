@@ -9,50 +9,54 @@
 namespace estun
 {
 
-class BottomLevelAccelerationStructure;
-class Buffer;
-class DeviceMemory;
+    class BottomLevelAccelerationStructure;
+    class Buffer;
+    class DeviceMemory;
 
-class TopLevelAccelerationStructure : public BaseAccelerationStructure, public Descriptable
-{
-public:
-    TopLevelAccelerationStructure(const TopLevelAccelerationStructure &) = delete;
-    TopLevelAccelerationStructure &operator=(const TopLevelAccelerationStructure &) = delete;
-    TopLevelAccelerationStructure &operator=(TopLevelAccelerationStructure &&) = delete;
+    struct VkGeometryInstance
+    {
+        float transform[12];
+        uint32_t instanceCustomIndex : 24;
+        uint32_t mask : 8;
+        uint32_t instanceOffset : 24;
+        uint32_t flags : 8;
+        uint64_t accelerationStructureHandle;
+    };
 
-    TopLevelAccelerationStructure(
-        //const std::vector<VkAccelerationStructureGeometryKHR> &geometries,
-        const std::vector<VkAccelerationStructureInstanceKHR> &geometryInstances,
-        //const std::vector<VkAccelerationStructureBuildOffsetInfoKHR> &buildOffsetInfos,
-        bool allowUpdate);
-    TopLevelAccelerationStructure(TopLevelAccelerationStructure &&other) noexcept;
-    virtual ~TopLevelAccelerationStructure();
+    class TopLevelAccelerationStructure : public BaseAccelerationStructure, public Descriptable
+    {
+    public:
+        TopLevelAccelerationStructure(const TopLevelAccelerationStructure &) = delete;
+        TopLevelAccelerationStructure &operator=(const TopLevelAccelerationStructure &) = delete;
+        TopLevelAccelerationStructure &operator=(TopLevelAccelerationStructure &&) = delete;
 
-    DescriptableInfo GetInfo() override;
+        TopLevelAccelerationStructure(const std::vector<VkGeometryInstance> &geometryInstances, bool allowUpdate);
+        TopLevelAccelerationStructure(TopLevelAccelerationStructure &&other) noexcept;
+        virtual ~TopLevelAccelerationStructure();
 
-    //const std::vector<VkAccelerationStructureGeometryKHR> &GetGeometries() const { return geometries_; }
-    const std::vector<VkAccelerationStructureInstanceKHR> &GetGeometryInstances() const { return geometryInstances_; }
+        DescriptableInfo GetInfo() override;
 
-    void Generate(
-        VkCommandBuffer commandBuffer,
-        DeviceMemory &resultMemory,
-        VkDeviceSize resultOffset,
-        bool updateOnly) const;
+        const std::vector<VkGeometryInstance> &GeometryInstances() const { return geometryInstances_; }
 
-    VkAccelerationStructureGeometryKHR CreateGeometry(
-        std::vector<VkAccelerationStructureInstanceKHR> geometryInstances) const;
-    static VkAccelerationStructureInstanceKHR CreateGeometryInstance(
-        const BottomLevelAccelerationStructure &bottomLevelAs,
-        const glm::mat4 &transform,
-        uint32_t instanceId,
-        uint32_t hitGroupIndex);
-    static VkAccelerationStructureBuildOffsetInfoKHR CreateBuildOffsetInfo(
-        uint32_t primitiveCount, uint32_t primitiveOffset);
+        void Generate(
+            VkCommandBuffer commandBuffer,
+            Buffer &scratchBuffer,
+            VkDeviceSize scratchOffset,
+            DeviceMemory &resultMemory,
+            VkDeviceSize resultOffset,
+            Buffer &instanceBuffer,
+            DeviceMemory &instanceMemory,
+            VkDeviceSize instanceOffset,
+            bool updateOnly) const;
 
-private:
-    std::vector<VkAccelerationStructureInstanceKHR> geometryInstances_;
-    //std::vector<VkAccelerationStructureBuildOffsetInfoKHR> buildOffsetInfos_;
-    //std::vector<VkAccelerationStructureGeometryKHR> geometries_;
-};
+        static VkGeometryInstance CreateGeometryInstance(
+            const BottomLevelAccelerationStructure &bottomLevelAs,
+            const glm::mat4 &transform,
+            uint32_t instanceId,
+            uint32_t hitGroupIndex);
+
+    private:
+        std::vector<VkGeometryInstance> geometryInstances_;
+    };
 
 } // namespace estun

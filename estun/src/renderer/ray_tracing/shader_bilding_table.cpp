@@ -75,7 +75,7 @@ estun::ShaderBindingTable::ShaderBindingTable(
     const size_t groupCount = rayGenPrograms.size() + missPrograms.size() + hitGroups.size();
     std::vector<uint8_t> shaderHandleStorage(groupCount * handleSize);
 
-    VK_CHECK_RESULT(FunctionsLocator::GetFunctions().vkGetRayTracingShaderGroupHandlesKHR(
+    VK_CHECK_RESULT(FunctionsLocator::GetFunctions().vkGetRayTracingShaderGroupHandlesNV(
               DeviceLocator::GetLogicalDevice(),
               rayTracingPipeline.GetPipeline(),
               0, static_cast<uint32_t>(groupCount),

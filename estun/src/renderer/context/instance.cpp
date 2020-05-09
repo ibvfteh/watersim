@@ -7,9 +7,9 @@
 #include <iostream>
 
 estun::Instance::Instance(const char *app_name,
-                                            const Version app_version,
-                                            const char *engine_name,
-                                            const Version engine_version)
+                          const Version app_version,
+                          const char *engine_name,
+                          const Version engine_version)
 {
     if (ValidationLayers::IsEnabled())
     {
@@ -50,9 +50,9 @@ std::vector<const char *> GetRequiredExtensions()
 }
 
 void estun::Instance::CreateInstance(const char *app_name,
-                                                       const Version app_version,
-                                                       const char *engine_name,
-                                                       const Version engine_version)
+                                     const Version app_version,
+                                     const char *engine_name,
+                                     const Version engine_version)
 
 {
     VkApplicationInfo applicationInfo = {};
@@ -61,7 +61,7 @@ void estun::Instance::CreateInstance(const char *app_name,
     applicationInfo.applicationVersion = VK_MAKE_VERSION(app_version.major, app_version.minor, app_version.patch);
     applicationInfo.pEngineName = engine_name;
     applicationInfo.engineVersion = VK_MAKE_VERSION(engine_version.major, engine_version.minor, engine_version.patch);
-    applicationInfo.apiVersion = VK_API_VERSION_1_0;
+    applicationInfo.apiVersion = VK_API_VERSION_1_0; //TODO VK_API_VERSION_1_2
 
     auto extensions = GetRequiredExtensions();
     for (auto extention : instanceExtensions)
@@ -69,8 +69,16 @@ void estun::Instance::CreateInstance(const char *app_name,
         extensions.push_back(extention);
     }
 
+    VkValidationFeatureEnableEXT enables[] = {
+        VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT};
+    VkValidationFeaturesEXT features = {};
+    features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+    features.enabledValidationFeatureCount = 1;
+    features.pEnabledValidationFeatures = enables;
+
     VkInstanceCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    createInfo.pNext = &features;
     createInfo.flags = 0;
     createInfo.pApplicationInfo = &applicationInfo;
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());

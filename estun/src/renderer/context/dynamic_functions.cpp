@@ -20,15 +20,18 @@ namespace
 } // namespace
 
 estun::DynamicFunctions::DynamicFunctions()
-    : vkCreateAccelerationStructureKHR(GetProcedure<PFN_vkCreateAccelerationStructureKHR>("vkCreateAccelerationStructureKHR")),
-      vkDestroyAccelerationStructureKHR(GetProcedure<PFN_vkDestroyAccelerationStructureKHR>("vkDestroyAccelerationStructureKHR")),
-      vkGetAccelerationStructureMemoryRequirementsKHR(GetProcedure<PFN_vkGetAccelerationStructureMemoryRequirementsKHR>("vkGetAccelerationStructureMemoryRequirementsKHR")),
-      vkBindAccelerationStructureMemoryKHR(GetProcedure<PFN_vkBindAccelerationStructureMemoryKHR>("vkBindAccelerationStructureMemoryKHR")),
-      vkGetAccelerationStructureDeviceAddressKHR(GetProcedure<PFN_vkGetAccelerationStructureDeviceAddressKHR>("vkGetAccelerationStructureDeviceAddressKHR")),
-      vkCmdBuildAccelerationStructureKHR(GetProcedure<PFN_vkCmdBuildAccelerationStructureKHR>("vkCmdBuildAccelerationStructureKHR")),
-      vkCreateRayTracingPipelinesKHR(GetProcedure<PFN_vkCreateRayTracingPipelinesKHR>("vkCreateRayTracingPipelinesKHR")),
-      vkGetRayTracingShaderGroupHandlesKHR(GetProcedure<PFN_vkGetRayTracingShaderGroupHandlesKHR>("vkGetRayTracingShaderGroupHandlesKHR")),
-      vkCmdTraceRaysKHR(GetProcedure<PFN_vkCmdTraceRaysKHR>("vkCmdTraceRaysKHR"))
+    : vkCreateAccelerationStructureNV(GetProcedure<PFN_vkCreateAccelerationStructureNV>("vkCreateAccelerationStructureNV")),
+      vkDestroyAccelerationStructureNV(GetProcedure<PFN_vkDestroyAccelerationStructureNV>("vkDestroyAccelerationStructureNV")),
+      vkGetAccelerationStructureMemoryRequirementsNV(GetProcedure<PFN_vkGetAccelerationStructureMemoryRequirementsNV>("vkGetAccelerationStructureMemoryRequirementsNV")),
+      vkBindAccelerationStructureMemoryNV(GetProcedure<PFN_vkBindAccelerationStructureMemoryNV>("vkBindAccelerationStructureMemoryNV")),
+      vkCmdBuildAccelerationStructureNV(GetProcedure<PFN_vkCmdBuildAccelerationStructureNV>("vkCmdBuildAccelerationStructureNV")),
+      vkCmdCopyAccelerationStructureNV(GetProcedure<PFN_vkCmdCopyAccelerationStructureNV>("vkCmdCopyAccelerationStructureNV")),
+      vkCmdTraceRaysNV(GetProcedure<PFN_vkCmdTraceRaysNV>("vkCmdTraceRaysNV")),
+      vkCreateRayTracingPipelinesNV(GetProcedure<PFN_vkCreateRayTracingPipelinesNV>("vkCreateRayTracingPipelinesNV")),
+      vkGetRayTracingShaderGroupHandlesNV(GetProcedure<PFN_vkGetRayTracingShaderGroupHandlesNV>("vkGetRayTracingShaderGroupHandlesNV")),
+      vkGetAccelerationStructureHandleNV(GetProcedure<PFN_vkGetAccelerationStructureHandleNV>("vkGetAccelerationStructureHandleNV")),
+      vkCmdWriteAccelerationStructuresPropertiesNV(GetProcedure<PFN_vkCmdWriteAccelerationStructuresPropertiesNV>("vkCmdWriteAccelerationStructuresPropertiesNV")),
+      vkCompileDeferredNV(GetProcedure<PFN_vkCompileDeferredNV>("vkCompileDeferredNV"))
 {
 }
 

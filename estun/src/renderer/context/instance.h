@@ -24,6 +24,7 @@ private:
     ValidationLayers *valLayers = nullptr;
 
     const std::vector<const char *> instanceExtensions = {
+        "VK_EXT_validation_features",
         "VK_KHR_get_physical_device_properties2"};
 
 public:

@@ -4,6 +4,7 @@
 #include "renderer/context/command_buffers.h"
 #include "renderer/context/command_pool.h"
 #include "renderer/context/device.h"
+#include "renderer/context/utils.h"
 
 namespace estun
 {
@@ -57,8 +58,8 @@ public:
 
         const auto queue = DeviceLocator::GetDevice().GetComputeQueue();
 
-        vkQueueSubmit(queue, 1, &submitInfo, nullptr);
-        vkQueueWaitIdle(queue);
+        VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, nullptr));
+        VK_CHECK_RESULT(vkQueueWaitIdle(queue));
     }
 
     static void SubmitTransfer(CommandPool &commandPool, const std::function<void(VkCommandBuffer)> &action)

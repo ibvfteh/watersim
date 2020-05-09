@@ -89,9 +89,9 @@ void estun::Context::Clear()
     DeleteSwapChain();
 }
 
-std::shared_ptr<estun::Render> estun::Context::CreateRender()
+std::shared_ptr<estun::Render> estun::Context::CreateRender(bool toDefault)
 {
-    std::shared_ptr<Render> render = std::make_shared<Render>();
+    std::shared_ptr<Render> render = std::make_shared<Render>(toDefault);
     renders_.push_back(render);
     return render;
 }

@@ -44,12 +44,14 @@ message(${ALL_LIBS})
 file(GLOB_RECURSE HEADER_FILES
 	estun/src/*.h
     cornell_box.h
+    water_surface.h
     )
 
 file(GLOB_RECURSE SOURCE_FILES
 	estun/src/*.cpp
     main.cpp
     cornell_box.cpp
+    water_surface.cpp
     )
 
 #message(${SOURCE_FILES})

@@ -3,7 +3,7 @@
 #include "renderer/context/device.h"
 #include "renderer/device_memory.h"
 #include "renderer/context/command_pool.h"
-
+#include "renderer/context/dynamic_functions.h"
 
 estun::Buffer::Buffer(const size_t size, const VkBufferUsageFlags usage)
 {
@@ -67,4 +67,47 @@ VkDeviceAddress estun::Buffer::GetDeviceAddress() const
 VkBuffer estun::Buffer::GetBuffer() const
 {
     return buffer;
+}
+
+void estun::Buffer::BufferMemoryBarrier(VkCommandBuffer commandBuffer, const Buffer &buffer, bool type)
+{
+    if (type)
+    {
+        VkBufferMemoryBarrier bufferMemoryBarrier = {};
+        bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+        bufferMemoryBarrier.pNext = NULL;
+        bufferMemoryBarrier.srcAccessMask = 0;
+        bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+        bufferMemoryBarrier.srcQueueFamilyIndex = DeviceLocator::GetDevice().GetQueueFamilyIndices().transferFamily.value();
+        bufferMemoryBarrier.dstQueueFamilyIndex = DeviceLocator::GetDevice().GetQueueFamilyIndices().computeFamily.value();
+        bufferMemoryBarrier.buffer = buffer.GetBuffer();
+        bufferMemoryBarrier.offset = 0;
+        bufferMemoryBarrier.size = VK_WHOLE_SIZE;
+
+        vkCmdPipelineBarrier(
+            commandBuffer,
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
+            VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+            0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+    }
+    else
+    {
+
+        VkBufferMemoryBarrier bufferMemoryBarrier = {};
+        bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+        bufferMemoryBarrier.pNext = NULL;
+        bufferMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+        bufferMemoryBarrier.dstAccessMask = 0;
+        bufferMemoryBarrier.srcQueueFamilyIndex = DeviceLocator::GetDevice().GetQueueFamilyIndices().computeFamily.value();
+        bufferMemoryBarrier.dstQueueFamilyIndex = DeviceLocator::GetDevice().GetQueueFamilyIndices().transferFamily.value();
+        bufferMemoryBarrier.buffer = buffer.GetBuffer();
+        bufferMemoryBarrier.offset = 0;
+        bufferMemoryBarrier.size = VK_WHOLE_SIZE;
+
+        vkCmdPipelineBarrier(
+            commandBuffer,
+            VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
+            0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+    }
 }

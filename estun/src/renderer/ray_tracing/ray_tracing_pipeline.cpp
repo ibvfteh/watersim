@@ -11,11 +11,7 @@
 
 estun::RayTracingPipeline::RayTracingPipeline(
     const std::vector<std::string> shaders,
-    const TopLevelAccelerationStructure &accelerationStructure,
-    const ImageView &accumulationImageView,
-    const ImageView &outputImageView,
-    const Descriptor &descriptor,
-    const std::vector<UniformBuffer> &uniformBuffers)
+    const Descriptor &descriptor)
 {
     // Load shaders.
     const ShaderModule rayGenShader(shaders[0]);
@@ -24,42 +20,42 @@ estun::RayTracingPipeline::RayTracingPipeline(
 
     std::vector<VkPipelineShaderStageCreateInfo> shaderStages =
         {
-            rayGenShader.CreateShaderStage(VK_SHADER_STAGE_RAYGEN_BIT_KHR),
-            missShader.CreateShaderStage(VK_SHADER_STAGE_MISS_BIT_KHR),
-            closestHitShader.CreateShaderStage(VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR)};
+            rayGenShader.CreateShaderStage(VK_SHADER_STAGE_RAYGEN_BIT_NV),
+            missShader.CreateShaderStage(VK_SHADER_STAGE_MISS_BIT_NV),
+            closestHitShader.CreateShaderStage(VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV)};
 
     // Shader groups
-    VkRayTracingShaderGroupCreateInfoKHR rayGenGroupInfo = {};
-    rayGenGroupInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+    VkRayTracingShaderGroupCreateInfoNV rayGenGroupInfo = {};
+    rayGenGroupInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_NV;
     rayGenGroupInfo.pNext = nullptr;
-    rayGenGroupInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
+    rayGenGroupInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_NV;
     rayGenGroupInfo.generalShader = 0;
-    rayGenGroupInfo.closestHitShader = VK_SHADER_UNUSED_KHR;
-    rayGenGroupInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
-    rayGenGroupInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
+    rayGenGroupInfo.closestHitShader = VK_SHADER_UNUSED_NV;
+    rayGenGroupInfo.anyHitShader = VK_SHADER_UNUSED_NV;
+    rayGenGroupInfo.intersectionShader = VK_SHADER_UNUSED_NV;
     rayGenIndex_ = 0;
 
-    VkRayTracingShaderGroupCreateInfoKHR missGroupInfo = {};
-    missGroupInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+    VkRayTracingShaderGroupCreateInfoNV missGroupInfo = {};
+    missGroupInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_NV;
     missGroupInfo.pNext = nullptr;
-    missGroupInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
+    missGroupInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_NV;
     missGroupInfo.generalShader = 1;
-    missGroupInfo.closestHitShader = VK_SHADER_UNUSED_KHR;
-    missGroupInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
-    missGroupInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
+    missGroupInfo.closestHitShader = VK_SHADER_UNUSED_NV;
+    missGroupInfo.anyHitShader = VK_SHADER_UNUSED_NV;
+    missGroupInfo.intersectionShader = VK_SHADER_UNUSED_NV;
     missIndex_ = 1;
 
-    VkRayTracingShaderGroupCreateInfoKHR triangleHitGroupInfo = {};
-    triangleHitGroupInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+    VkRayTracingShaderGroupCreateInfoNV triangleHitGroupInfo = {};
+    triangleHitGroupInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_NV;
     triangleHitGroupInfo.pNext = nullptr;
-    triangleHitGroupInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;
-    triangleHitGroupInfo.generalShader = VK_SHADER_UNUSED_KHR;
+    triangleHitGroupInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_NV;
+    triangleHitGroupInfo.generalShader = VK_SHADER_UNUSED_NV;
     triangleHitGroupInfo.closestHitShader = 2;
-    triangleHitGroupInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
-    triangleHitGroupInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
+    triangleHitGroupInfo.anyHitShader = VK_SHADER_UNUSED_NV;
+    triangleHitGroupInfo.intersectionShader = VK_SHADER_UNUSED_NV;
     triangleHitGroupIndex_ = 2;
 
-    std::vector<VkRayTracingShaderGroupCreateInfoKHR> groups =
+    std::vector<VkRayTracingShaderGroupCreateInfoNV> groups =
         {
             rayGenGroupInfo,
             missGroupInfo,
@@ -67,8 +63,8 @@ estun::RayTracingPipeline::RayTracingPipeline(
         };
 
     // Create graphic pipeline
-    VkRayTracingPipelineCreateInfoKHR pipelineInfo = {};
-    pipelineInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
+    VkRayTracingPipelineCreateInfoNV pipelineInfo = {};
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_NV;
     pipelineInfo.pNext = nullptr;
     pipelineInfo.flags = 0;
     pipelineInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
@@ -80,7 +76,7 @@ estun::RayTracingPipeline::RayTracingPipeline(
     pipelineInfo.basePipelineHandle = nullptr;
     pipelineInfo.basePipelineIndex = 0;
 
-    VK_CHECK_RESULT(FunctionsLocator::GetFunctions().vkCreateRayTracingPipelinesKHR(DeviceLocator::GetLogicalDevice(), nullptr, 1, &pipelineInfo, nullptr, &pipeline_), "create ray tracing pipeline");
+    VK_CHECK_RESULT(FunctionsLocator::GetFunctions().vkCreateRayTracingPipelinesNV(DeviceLocator::GetLogicalDevice(), nullptr, 1, &pipelineInfo, nullptr, &pipeline_), "create ray tracing pipeline");
 }
 
 estun::RayTracingPipeline::~RayTracingPipeline()
@@ -94,7 +90,7 @@ estun::RayTracingPipeline::~RayTracingPipeline()
 
 void estun::RayTracingPipeline::Bind(VkCommandBuffer &commandBuffer)
 {
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipeline_);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_NV, pipeline_);
 }
 
 VkPipeline estun::RayTracingPipeline::GetPipeline() const

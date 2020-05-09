@@ -6,42 +6,38 @@
 namespace estun
 {
 
-class DeviceMemory;
-class Buffer;
-class BaseAccelerationStructure;
+    class DeviceMemory;
+    class Buffer;
+    class BaseAccelerationStructure;
 
-class BottomLevelAccelerationStructure : public BaseAccelerationStructure
-{
-public:
-    BottomLevelAccelerationStructure(const BottomLevelAccelerationStructure &) = delete;
-    BottomLevelAccelerationStructure(BottomLevelAccelerationStructure &&other) noexcept;
-    
-    BottomLevelAccelerationStructure &operator=(const BottomLevelAccelerationStructure &) = delete;
-    BottomLevelAccelerationStructure &operator=(BottomLevelAccelerationStructure &&) = delete;
+    class BottomLevelAccelerationStructure : public BaseAccelerationStructure
+    {
+    public:
+        BottomLevelAccelerationStructure(const BottomLevelAccelerationStructure &) = delete;
+        BottomLevelAccelerationStructure(BottomLevelAccelerationStructure &&other) noexcept;
 
-    BottomLevelAccelerationStructure(
-        const std::vector<VkAccelerationStructureGeometryKHR> &geometries,
-        const std::vector<VkAccelerationStructureCreateGeometryTypeInfoKHR> &geometryInfos,
-        const std::vector<VkAccelerationStructureBuildOffsetInfoKHR> &buildOffsetInfos,
-        bool allowUpdate);
-    ~BottomLevelAccelerationStructure();
+        BottomLevelAccelerationStructure &operator=(const BottomLevelAccelerationStructure &) = delete;
+        BottomLevelAccelerationStructure &operator=(BottomLevelAccelerationStructure &&) = delete;
 
-    void Generate(
-        VkCommandBuffer commandBuffer,
-        DeviceMemory &resultMemory,
-        VkDeviceSize resultOffset,
-        bool updateOnly) const;
+        BottomLevelAccelerationStructure(const std::vector<VkGeometryNV> &geometries, bool allowUpdate);
+        ~BottomLevelAccelerationStructure();
 
-    VkDeviceAddress GetDeviceAddress() const;
+        void Generate(
+            VkCommandBuffer commandBuffer,
+            Buffer &scratchBuffer,
+            VkDeviceSize scratchOffset,
+            DeviceMemory &resultMemory,
+            VkDeviceSize resultOffset,
+            bool updateOnly) const;
 
-    static VkAccelerationStructureGeometryKHR CreateGeometry(const Buffer &vertexBuffer, const Buffer &indexBuffer, bool isOpaque);
-    static VkAccelerationStructureCreateGeometryTypeInfoKHR CreateGeometryInfo(uint32_t primitiveCount, uint32_t vertexCount);
-    static VkAccelerationStructureBuildOffsetInfoKHR CreateBuildOffsetInfo(uint32_t primitiveCount, uint32_t primitiveOffset, uint32_t firstVertex);
+        static VkGeometryNV CreateGeometry(
+            const Buffer &vertexBuffer, const Buffer &indexBuffer,
+            uint32_t vertexOffset, uint32_t vertexCount,
+            uint32_t indexOffset, uint32_t indexCount,
+            bool isOpaque);
 
-private:
-    std::vector<VkAccelerationStructureGeometryKHR> geometries_;
-    std::vector<VkAccelerationStructureCreateGeometryTypeInfoKHR> geometryInfos_;
-    std::vector<VkAccelerationStructureBuildOffsetInfoKHR> buildOffsetInfos_;
-};
+    private:
+        std::vector<VkGeometryNV> geometries_;
+    };
 
 } // namespace estun

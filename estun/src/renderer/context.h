@@ -63,7 +63,7 @@ public:
 
     void DrawIndexed(uint32_t indexesSize, uint32_t indexOffset, uint32_t vertexOffset);
 
-    std::shared_ptr<Render> CreateRender();
+    std::shared_ptr<Render> CreateRender(bool toDefault = true);
 
     //void CreateRayTracingOutputImage();
     //void DeleteRayTracingOutputImage();
