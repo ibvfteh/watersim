@@ -9,6 +9,12 @@ namespace estun
     class Descriptor;
     class ShaderModule;
 
+    struct Shader
+    {
+        std::string name;
+        VkShaderStageFlagBits bits;
+    };
+
     class GraphicsPipeline
     {
     public:
@@ -19,12 +25,12 @@ namespace estun
         GraphicsPipeline &operator=(GraphicsPipeline &&) = delete;
 
         GraphicsPipeline(
-            const std::string vertexShaderName,
-            const std::string fragmentShaderName,
+            const std::vector<Shader> shaders,
             std::unique_ptr<RenderPass> &renderPass,
             std::shared_ptr<Descriptor> descriptor,
             VkSampleCountFlagBits msaa,
             bool isWireFrame);
+
         ~GraphicsPipeline();
 
         void Create(std::unique_ptr<RenderPass> &renderPass);
@@ -45,8 +51,7 @@ namespace estun
         std::shared_ptr<Descriptor> descriptor_;
 
         std::vector<VkPipelineShaderStageCreateInfo> shaderStages_;
-        std::unique_ptr<ShaderModule> vertShaderModule_;
-        std::unique_ptr<ShaderModule> fragShaderModule_;
+        std::vector<std::shared_ptr<ShaderModule>> shaderModules;
     };
 
 } // namespace estun

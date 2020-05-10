@@ -10,7 +10,6 @@ class DeviceProcedures;
 class TopLevelAccelerationStructure;
 class ImageView;
 class Descriptor;
-class UniformBuffer;
 class DescriptorBinding;
 
 class RayTracingPipeline

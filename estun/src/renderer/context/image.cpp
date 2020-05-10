@@ -10,13 +10,11 @@
 estun::Image::Image(const uint32_t width, const uint32_t height, VkFormat format)
     : Image(width, height, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT)
 {
-
 }
 
 estun::Image::Image(const uint32_t width, const uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage)
     : Image(width, height, 1, VK_SAMPLE_COUNT_1_BIT, format, tiling, usage)
 {
-    
 }
 
 estun::Image::Image(
@@ -86,8 +84,7 @@ VkMemoryRequirements estun::Image::GetMemoryRequirements() const
 void estun::Image::TransitionImageLayout(const VkImageLayout &newLayout)
 {
 
-    SingleTimeCommands::SubmitGraphics(CommandPoolLocator::GetGraphicsPool(), [&](VkCommandBuffer commandBuffer) 
-    {
+    SingleTimeCommands::SubmitGraphics(CommandPoolLocator::GetGraphicsPool(), [&](VkCommandBuffer commandBuffer) {
         VkImageMemoryBarrier barrier = {};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = layout_;
@@ -141,6 +138,14 @@ void estun::Image::TransitionImageLayout(const VkImageLayout &newLayout)
             sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
             destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         }
+        else if (layout_ == VK_IMAGE_LAYOUT_GENERAL || newLayout == VK_IMAGE_LAYOUT_GENERAL)
+        {
+            barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+
+            sourceStage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+            destinationStage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+        }
         else
         {
             ES_CORE_ASSERT("Unsupported layout transition");
@@ -154,8 +159,7 @@ void estun::Image::TransitionImageLayout(const VkImageLayout &newLayout)
 
 void estun::Image::CopyFrom(const Buffer &buffer)
 {
-    SingleTimeCommands::SubmitGraphics(CommandPoolLocator::GetGraphicsPool(), [&](VkCommandBuffer commandBuffer) 
-    {
+    SingleTimeCommands::SubmitGraphics(CommandPoolLocator::GetGraphicsPool(), [&](VkCommandBuffer commandBuffer) {
         VkBufferImageCopy region = {};
         region.bufferOffset = 0;
         region.bufferRowLength = 0;
@@ -181,8 +185,7 @@ void estun::Image::GenerateMipmaps()
         ES_CORE_ASSERT("Texture image format does not support linear blitting");
     }
 
-    SingleTimeCommands::SubmitTransfer(CommandPoolLocator::GetTransferPool(), [&](VkCommandBuffer commandBuffer) 
-    {
+    SingleTimeCommands::SubmitTransfer(CommandPoolLocator::GetTransferPool(), [&](VkCommandBuffer commandBuffer) {
         VkImageMemoryBarrier barrier = {};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.image = image;
@@ -289,4 +292,9 @@ VkImageLayout estun::Image::GetLayout()
 uint32_t estun::Image::GetMipLevels()
 {
     return mipLevels_;
+}
+
+void estun::Image::SetLayout(VkImageLayout layout)
+{
+    layout_ = layout;
 }

@@ -19,6 +19,7 @@ estun::Model CornellBox::CreateCornellBox(const float scale)
 	CornellBox::Create(scale, vertices, indices, materials);
 
 	return estun::Model(
+		"box",
 		std::move(vertices),
 		std::move(indices),
 		std::move(materials)

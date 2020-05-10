@@ -10,7 +10,6 @@ class DeviceProcedures;
 class TopLevelAccelerationStructure;
 class ImageView;
 class Descriptor;
-class UniformBuffer;
 class DescriptorBinding;
 
 class RayTracingPipeline
@@ -26,8 +25,7 @@ public:
         const TopLevelAccelerationStructure &accelerationStructure,
         const ImageView &accumulationImageView,
         const ImageView &outputImageView,
-        const Descriptor &descriptor,
-        const std::vector<UniformBuffer> &uniformBuffers);
+        const Descriptor &descriptor);
     ~RayTracingPipeline();
 
     void Bind(VkCommandBuffer &commandBuffer);

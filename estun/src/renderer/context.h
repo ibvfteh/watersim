@@ -16,6 +16,7 @@
 #include "renderer/context/semaphore.h"
 #include "renderer/context/fence.h"
 #include "renderer/render.h"
+#include "renderer/compute_render.h"
 
 namespace estun
 {
@@ -64,6 +65,7 @@ public:
     void DrawIndexed(uint32_t indexesSize, uint32_t indexOffset, uint32_t vertexOffset);
 
     std::shared_ptr<Render> CreateRender(bool toDefault = true);
+    std::shared_ptr<ComputeRender> CreateComputeRender();
 
     //void CreateRayTracingOutputImage();
     //void DeleteRayTracingOutputImage();
@@ -87,9 +89,11 @@ private:
 
     std::vector<Semaphore> imageAvailableSemaphores_;
     std::vector<Semaphore> renderFinishedSemaphores_;
+    std::vector<Semaphore> computeFinishedSemaphores_;
     std::vector<Fence> inFlightFences_;
 
     std::vector<std::shared_ptr<Render>> renders_;
+    std::vector<std::shared_ptr<ComputeRender>> cRenders_;
 
     // TODO VK_POLYGON_MODE_LINE
     // VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;

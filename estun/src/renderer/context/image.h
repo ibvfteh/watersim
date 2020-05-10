@@ -46,6 +46,8 @@ public:
 	VkFormat GetFormat();
 	VkImageLayout GetLayout();
 	uint32_t GetMipLevels();
+
+	void SetLayout(VkImageLayout layout);
 };
 
 } // namespace estun

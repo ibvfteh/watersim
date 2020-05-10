@@ -9,6 +9,9 @@ set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g" )
+
 find_package(Vulkan REQUIRED)
 
 include_directories(${Vulkan_INCLUDE_DIR})
@@ -58,9 +61,11 @@ file(GLOB_RECURSE SOURCE_FILES
 
 #uncomment this to detect broken memory problems via gcc sanitizers
 #set(ASAN_OPTIONS fast_unwind_on_malloc=0)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer -fsanitize=leak -fsanitize=undefined -fsanitize=bounds-strict")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer -fsanitize=leak -fsanitize=undefined -fsanitize=bounds-strict")
 
 #add_library(estun STATIC ${HEADER_FILES} ${SOURCE_FILES})
-add_executable(test ${HEADER_FILES} ${SOURCE_FILES})
+add_executable(sim ${HEADER_FILES} ${SOURCE_FILES})
 
-target_link_libraries(test ${ALL_LIBS} glfw imgui stbi tinyobjloader)
+target_link_libraries(sim ${ALL_LIBS} glfw imgui stbi tinyobjloader)
+
+file (COPY assets/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)

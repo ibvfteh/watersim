@@ -16,7 +16,7 @@ public:
     PipelineLayout &operator=(const PipelineLayout &) = delete;
     PipelineLayout &operator=(PipelineLayout &&) = delete;
 
-    PipelineLayout(const DescriptorSetLayout &descriptorSetLayout);
+    PipelineLayout(const DescriptorSetLayout &descriptorSetLayout, VkPushConstantRange pushConstantRange = {}, bool flag = false);
     ~PipelineLayout();
 
     VkPipelineLayout &GetPipelineLayout();

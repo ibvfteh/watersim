@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <vector>
 
-estun::Model estun::Model::LoadModel(const std::string &filename)
+estun::Model estun::Model::LoadModel(const std::string &name, const std::string &filename)
 {
     ES_CORE_INFO(std::string("Loading '") + filename + std::string("'... "));
 
@@ -108,7 +108,7 @@ estun::Model estun::Model::LoadModel(const std::string &filename)
                  std::to_string(uniqueVertices.size()) + std::string(" unique vertices, ") +
                  std::to_string(materials.size()) + std::string(" materials)"));
 
-    return Model(std::move(vertices), std::move(indices), std::move(materials));
+    return Model(name, std::move(vertices), std::move(indices), std::move(materials));
 }
 
 estun::Model estun::Model::CreateBox(const glm::vec3 &p0, const glm::vec3 &p1, const Material &material)
@@ -156,6 +156,7 @@ estun::Model estun::Model::CreateBox(const glm::vec3 &p0, const glm::vec3 &p1, c
             20, 21, 22, 20, 22, 23};
 
     return Model(
+        "cube",
         std::move(vertices),
         std::move(indices),
         std::vector<Material>{material});
@@ -225,6 +226,7 @@ estun::Model estun::Model::CreateSphere(const glm::vec3 &center, float radius, c
     }
 
     return Model(
+        "sphere",
         std::move(vertices),
         std::move(indices),
         std::vector<Material>{material});
@@ -251,8 +253,9 @@ void estun::Model::Transform(const glm::mat4 &transform)
     }
 }
 
-estun::Model::Model(std::vector<Vertex> &&vertices, std::vector<uint32_t> &&indices, std::vector<Material> &&materials)
-    : vertices_(std::move(vertices)),
+estun::Model::Model(const std::string &name, std::vector<Vertex> &&vertices, std::vector<uint32_t> &&indices, std::vector<Material> &&materials)
+    : name_(name),
+      vertices_(std::move(vertices)),
       indices_(std::move(indices)),
       materials_(std::move(materials)),
       verticesSize_(vertices_.size()),

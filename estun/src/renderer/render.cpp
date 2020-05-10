@@ -113,11 +113,11 @@ void estun::Render::Recreate()
 }
 
 std::shared_ptr<estun::GraphicsPipeline> estun::Render::CreatePipeline(
-    const std::string vertexShaderName,
-    const std::string fragmentShaderName,
-    const std::shared_ptr<Descriptor> descriptor)
+    const std::vector<Shader> shaders,
+    const std::shared_ptr<Descriptor> descriptor,
+    bool wireFrame)
 {
-    std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(vertexShaderName, fragmentShaderName, renderPass_, descriptor, ContextLocator::GetContext()->GetMsaaSamples(), false);
+    std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(shaders, renderPass_, descriptor, ContextLocator::GetContext()->GetMsaaSamples(), wireFrame);
     pipelines_.push_back(pipeline);
     return pipeline;
 }
@@ -145,7 +145,7 @@ void estun::Render::RecordDrawInCurrent()
 
 void estun::Render::Bind(std::shared_ptr<Descriptor> descriptor)
 {
-    descriptor->Bind(GetCurrCommandBuffer());
+    descriptor->Bind(GetCurrCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS);
 }
 
 void estun::Render::Bind(std::shared_ptr<GraphicsPipeline> pipeline)

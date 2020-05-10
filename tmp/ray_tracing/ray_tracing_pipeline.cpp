@@ -14,8 +14,7 @@ estun::RayTracingPipeline::RayTracingPipeline(
     const TopLevelAccelerationStructure &accelerationStructure,
     const ImageView &accumulationImageView,
     const ImageView &outputImageView,
-    const Descriptor &descriptor,
-    const std::vector<UniformBuffer> &uniformBuffers)
+    const Descriptor &descriptor)
 {
     // Load shaders.
     const ShaderModule rayGenShader(shaders[0]);

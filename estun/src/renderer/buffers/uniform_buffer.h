@@ -10,26 +10,7 @@ namespace estun
     class Buffer;
     class DeviceMemory;
 
-    struct UniformBufferObject
-    {
-        //alignas(16) glm::mat4 model;
-        //alignas(16) glm::mat4 view;
-        //alignas(16) glm::mat4 proj;
-        glm::mat4 model;
-        glm::mat4 view;
-        glm::mat4 projection;
-        //glm::mat4 ModelViewInverse;
-        //glm::mat4 ProjectionInverse;
-        //float Aperture;
-        //float FocusDistance;
-        //uint32_t TotalNumberOfSamples;
-        //uint32_t NumberOfSamples;
-        //uint32_t NumberOfBounces;
-        //uint32_t RandomSeed;
-        //uint32_t GammaCorrection; // bool
-        //uint32_t HasSky;          // bool
-    };
-
+    template <class T>
     class UniformBuffer : public Descriptable
     {
     public:
@@ -37,15 +18,43 @@ namespace estun
         UniformBuffer &operator=(const UniformBuffer &) = delete;
         UniformBuffer &operator=(UniformBuffer &&) = delete;
 
-        explicit UniformBuffer();
-        UniformBuffer(UniformBuffer &&other) noexcept;
-        ~UniformBuffer();
+        explicit UniformBuffer()
+        {
+            const auto bufferSize = sizeof(T);
 
-        DescriptableInfo GetInfo() override;
+            buffer.reset(new Buffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT));
+            memory.reset(new DeviceMemory(buffer->AllocateMemory(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)));
+        }
 
-        const Buffer &GetBuffer() const;
+        UniformBuffer(UniformBuffer &&other) noexcept
+            : buffer(other.buffer.release()),
+              memory(other.memory.release())
+        {
+        }
 
-        template <class T>
+        ~UniformBuffer()
+        {
+            buffer.reset();
+            memory.reset();
+        }
+
+        DescriptableInfo GetInfo() override
+        {
+            VkDescriptorBufferInfo uniformBufferInfo = {};
+            uniformBufferInfo.buffer = buffer->GetBuffer();
+            uniformBufferInfo.range = VK_WHOLE_SIZE;
+
+            DescriptableInfo info;
+            info.bI = uniformBufferInfo;
+
+            return info;
+        }
+
+        const Buffer &GetBuffer() const
+        {
+            return *buffer;
+        }
+
         void SetValue(const T &ubo)
         {
             const auto data = memory->Map(0, sizeof(T));

@@ -58,6 +58,7 @@ void estun::Context::CreateSwapChain()
     {
         imageAvailableSemaphores_.emplace_back();
         renderFinishedSemaphores_.emplace_back();
+        computeFinishedSemaphores_.emplace_back();
         inFlightFences_.emplace_back(true);
     }
     ES_CORE_INFO("Semaphores done");
@@ -68,6 +69,7 @@ void estun::Context::DeleteSwapChain()
     inFlightFences_.clear();
     renderFinishedSemaphores_.clear();
     imageAvailableSemaphores_.clear();
+    computeFinishedSemaphores_.clear();
     swapChain_.reset();
 }
 
@@ -76,7 +78,7 @@ void estun::Context::RecreateSwapChain()
     device_->WaitIdle();
     DeleteSwapChain();
     CreateSwapChain();
-    for (auto & render : renders_)
+    for (auto &render : renders_)
     {
         render->Recreate();
     }
@@ -86,6 +88,7 @@ void estun::Context::Clear()
 {
     device_->WaitIdle();
     renders_.clear();
+    cRenders_.clear();
     DeleteSwapChain();
 }
 
@@ -93,6 +96,13 @@ std::shared_ptr<estun::Render> estun::Context::CreateRender(bool toDefault)
 {
     std::shared_ptr<Render> render = std::make_shared<Render>(toDefault);
     renders_.push_back(render);
+    return render;
+}
+
+std::shared_ptr<estun::ComputeRender> estun::Context::CreateComputeRender()
+{
+    std::shared_ptr<ComputeRender> render = std::make_shared<ComputeRender>();
+    cRenders_.push_back(render);
     return render;
 }
 
@@ -121,11 +131,36 @@ void estun::Context::StartDraw()
 
 void estun::Context::SubmitDraw()
 {
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
     const auto imageAvailableSemaphore = imageAvailableSemaphores_[currentFrame_].GetSemaphore();
     const auto renderFinishedSemaphore = renderFinishedSemaphores_[currentFrame_].GetSemaphore();
+    const auto computeFinishedSemaphore = computeFinishedSemaphores_[currentFrame_].GetSemaphore();
+
+    std::vector<VkCommandBuffer> computeCommandBuffers;
+    for (auto &render : cRenders_)
+    {
+        computeCommandBuffers.push_back(render->GetCurrCommandBuffer());
+    };
+
+    VkSemaphore computeWaitSemaphores[] = {imageAvailableSemaphore};
+    VkPipelineStageFlags computeWaitStages[] = {VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT};
+    VkSemaphore computeSignalSemaphores[] = {computeFinishedSemaphore};
+
+    VkSubmitInfo computeSubmitInfo = {};
+    computeSubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    computeSubmitInfo.waitSemaphoreCount = 1;
+    computeSubmitInfo.pWaitSemaphores = computeWaitSemaphores;
+    computeSubmitInfo.pWaitDstStageMask = computeWaitStages;
+    computeSubmitInfo.commandBufferCount = static_cast<uint32_t>(computeCommandBuffers.size());
+    computeSubmitInfo.pCommandBuffers = computeCommandBuffers.data();
+    computeSubmitInfo.signalSemaphoreCount = 1;
+    computeSubmitInfo.pSignalSemaphores = computeSignalSemaphores;
+
+    VK_CHECK_RESULT(vkQueueSubmit(device_->GetComputeQueue(), 1, &computeSubmitInfo, nullptr), "submit compute command buffers");
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
     auto &inFlightFence = inFlightFences_[currentFrame_];
 
     std::vector<VkCommandBuffer> commandBuffers;
@@ -133,21 +168,21 @@ void estun::Context::SubmitDraw()
     {
         commandBuffers.push_back(render->GetCurrCommandBuffer());
     }
-    VkSemaphore waitSemaphores[] = {imageAvailableSemaphore};
+    VkSemaphore waitSemaphores[] = {computeFinishedSemaphore};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     VkSemaphore signalSemaphores[] = {renderFinishedSemaphore};
 
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
-    submitInfo.commandBufferCount = 1;
+    submitInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
     submitInfo.pCommandBuffers = commandBuffers.data();
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
     inFlightFence.Reset();
 
-    VK_CHECK_RESULT(vkQueueSubmit(device_->GetGraphicsQueue(), 1, &submitInfo, inFlightFence.GetFence()), "submit draw command buffer");
+    VK_CHECK_RESULT(vkQueueSubmit(device_->GetGraphicsQueue(), 1, &submitInfo, inFlightFence.GetFence()), "submit draw command buffers");
 
     VkSwapchainKHR swapChains[] = {swapChain_->GetSwapChain()};
     VkPresentInfoKHR presentInfo = {};

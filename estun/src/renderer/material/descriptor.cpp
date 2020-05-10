@@ -48,7 +48,7 @@ estun::Descriptor::Descriptor(const std::vector<DescriptorBinding> &descriptorBi
         descriptorSets->UpdateDescriptors(index, descriptorWrites);
     }
 
-    pipelineLayout.reset(new PipelineLayout(*descriptorSetLayout));
+    pipelineLayout.reset(new PipelineLayout(*descriptorSetLayout, {}));
 }
 
 estun::Descriptor::~Descriptor()
@@ -74,59 +74,14 @@ estun::PipelineLayout &estun::Descriptor::GetPipelineLayout() const
     return *pipelineLayout;
 }
 
-void estun::Descriptor::Bind(VkCommandBuffer &commandBuffer)
+void estun::Descriptor::Bind(VkCommandBuffer &commandBuffer,  VkPipelineBindPoint point)
 {
     VkDescriptorSet vkDescriptorSets[] = {descriptorSets->GetDescriptorSet(ContextLocator::GetImageIndex())};
     vkCmdBindDescriptorSets(
         commandBuffer,
-        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        point,
         pipelineLayout->GetPipelineLayout(),
         0, 1,
         vkDescriptorSets,
         0, nullptr);
 }
-
-/*
-
-void estun::Descriptor::Push(uint32_t index, Buffer &buffer)
-{
-    VkDescriptorBufferInfo uniformBufferInfo = {};
-    uniformBufferInfo.buffer = buffer.GetBuffer();
-    uniformBufferInfo.range = VK_WHOLE_SIZE;
-
-    descriptorWrites.push_back(descriptorSets->Bind(index, descriptorWrites.size(), uniformBufferInfo));
-}
-
-void estun::Descriptor::Push(uint32_t index, Texture &texture)
-{
-    VkDescriptorImageInfo imageInfo;
-    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageInfo.imageView = texture.GetImageView().GetImageView();
-    imageInfo.sampler = texture.GetSampler().GetSampler();
-
-    descriptorWrites.push_back(descriptorSets->Bind(index, descriptorWrites.size(), imageInfo));
-}
-
-void estun::Descriptor::Push(uint32_t index, TopLevelAccelerationStructure &accelerationStructure)
-{
-    const auto accelerationStructureHandle = accelerationStructure.GetStructure();
-    VkWriteDescriptorSetAccelerationStructureNV structureInfo = {};
-    structureInfo.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_NV;
-    structureInfo.pNext = nullptr;
-    structureInfo.accelerationStructureCount = 1;
-    structureInfo.pAccelerationStructures = &accelerationStructureHandle;
-
-    descriptorWrites.push_back(descriptorSets->Bind(index, descriptorWrites.size(), structureInfo));
-}
-
-void estun::Descriptor::Update(uint32_t index)
-{
-    descriptorSets->UpdateDescriptors(index, descriptorWrites);
-}
-
-void estun::Descriptor::BuildPipelineLayout()
-{
-    pipelineLayout.reset(new PipelineLayout(*descriptorSetLayout));
-}
-
-*/

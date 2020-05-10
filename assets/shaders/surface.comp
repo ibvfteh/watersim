@@ -1,75 +1,53 @@
 #version 450
 
-struct Vertex {
-    vec4 pos;
-    vec4 color;
-    vec4 texCoord;
-};
+layout (local_size_x = 32, local_size_y = 32) in;
 
-layout(std430, binding = 0) buffer VretexA {
-	Vertex vretexA[ ];
-};
+layout (binding = 0, rgba16) uniform readonly image2D prevImage;
+layout (binding = 1, rgba16) uniform readonly image2D currImage;
+layout (binding = 2, rgba16) uniform image2D nextImage;
 
-layout(std430, binding = 1) buffer VretexB {
-	Vertex vretexB[ ];
-};
+layout(binding = 3) uniform UserSimulationInput {
+    vec4 mouse;
+    float scale;
+} usi;
 
-layout(std430, binding = 2) buffer VretexC {
-	Vertex vretexC[ ];
-};
+#define RELAX 1.985
 
-//layout (local_size_x = 10, local_size_y = 10) in;
-int x = 101;
-int y = 101;
-
-
-void main() 
-{
-	uvec3 id = gl_GlobalInvocationID; 
-    float w = 1.985;
-	uint index = id.y * x + id.x;
-    float sum = 0;
-    float count = 0;
-    if(id.x == 0 || id.y == 0 || id.x == x-1 || id.y == y-1) {
-        vretexA[index].pos.y = 0.0;
+void main() {
+    if (gl_GlobalInvocationID.x >= usi.scale || gl_GlobalInvocationID.y >= usi.scale)
         return;
-    }
-	if (id.x > 0) {
-        sum += vretexB[index - 1].pos.y;
-        count += 1.0;
-    }
-	if (id.x < x - 1) {
-        sum += vretexB[index + 1].pos.y;
-        count += 1.0;
-    }
-	if (id.y > 0) {
-	    uint index2 = (id.y - 1) * x + id.x;
-        sum += vretexB[index2].pos.y;
-        count += 1.0;
-    }
-	if (id.y < y - 1) {
-	    uint index2 = (id.y + 1) * x + id.x;
-        sum += vretexB[index2].pos.y;
-        count += 1.0;
+
+    if (usi.mouse.z > 0.0) {
+        if ((gl_GlobalInvocationID.x >= (usi.mouse.x * usi.scale) - 2) && (gl_GlobalInvocationID.x <= (usi.mouse.x * usi.scale) + 2) 
+                && (gl_GlobalInvocationID.y >= (usi.mouse.y * usi.scale) - 2) && (gl_GlobalInvocationID.y <= (usi.mouse.y * usi.scale) + 2)) {
+
+            imageStore(nextImage, ivec2(gl_GlobalInvocationID.xy), vec4(-2.0));
+            return;
+        }
     }
 
-	if (id.x > x) {
-        return;
-    }
-	if (id.x < 0) {
-        return;
-    }
-	if (id.y > y) {
-        return;
-    }
-	if (id.y < 0) {
-        return;
-    }
-    //vretexC[index].color = vec4(vec3(count / 4.0), 1.0f);
-    //vretexC[index].pos.x = 1.0f;
-    //vretexC[index].pos.z = 1.0f;
-    //vretexC[index].pos.w = 1.0f;
-    //vretexC[index].texCoord.x = 1.0f;
-    //vretexC[index].texCoord.y = 1.0f;
-    vretexC[index].pos.y = (1-w) * vretexA[index].pos.y + w * sum / count;
+    vec4 hPrev = imageLoad(prevImage, ivec2(gl_GlobalInvocationID.xy));
+
+    vec4 hUp;
+    if (gl_GlobalInvocationID.y - 1 < 0)
+        hUp = vec4(0);
+    else hUp = imageLoad(currImage, ivec2(gl_GlobalInvocationID.xy) + ivec2(0, -1));
+
+    vec4 hDown;
+    if (gl_GlobalInvocationID.y - 1 >= usi.scale)
+        hDown = vec4(0);
+    else hDown = imageLoad(currImage, ivec2(gl_GlobalInvocationID.xy) + ivec2(0, 1));
+
+    vec4 hLeft;
+    if (gl_GlobalInvocationID.x - 1 < 0)
+        hLeft = vec4(0);
+    else hLeft = imageLoad(currImage, ivec2(gl_GlobalInvocationID.xy) + ivec2(-1, 0));
+
+    vec4 hRight;
+    if (gl_GlobalInvocationID.x + 1 >= usi.scale)
+        hRight = vec4(0);
+    else hRight = imageLoad(currImage, ivec2(gl_GlobalInvocationID.xy) + ivec2(1, 0));
+
+    vec4 height = (1.0 - RELAX) * hPrev + RELAX * 0.25 * (hUp + hDown + hLeft + hRight);
+    imageStore(nextImage, ivec2(gl_GlobalInvocationID.xy), clamp(height, -1, 1));
 }

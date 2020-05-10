@@ -212,6 +212,9 @@ void estun::Device::CreateLogicalDevice(estun::Instance *instance, estun::Surfac
 
     VkPhysicalDeviceFeatures deviceFeatures = {};
     deviceFeatures.samplerAnisotropy = VK_TRUE;
+    deviceFeatures.shaderClipDistance = VK_TRUE;
+    deviceFeatures.geometryShader = VK_TRUE;
+    deviceFeatures.fillModeNonSolid = VK_TRUE;
 
 	VkPhysicalDeviceDescriptorIndexingFeaturesEXT indexingFeatures = {};
 	indexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT;

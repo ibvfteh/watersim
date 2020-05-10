@@ -7,16 +7,16 @@ estun::DeviceMemory::DeviceMemory(
 	const VkMemoryPropertyFlags properties,
 	bool flag) 
 {
-	VkMemoryAllocateFlagsInfo flagsInfo = {};
-	flagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
-	flagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT;
+	//VkMemoryAllocateFlagsInfo flagsInfo = {};
+	//flagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
+	//flagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT;
 
 	VkMemoryAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = size;
 	if (flag)
 	{
-		allocInfo.pNext = &flagsInfo;
+		//allocInfo.pNext = &flagsInfo;
 	}
 	allocInfo.memoryTypeIndex = FindMemoryType(memoryTypeBits, properties);
 

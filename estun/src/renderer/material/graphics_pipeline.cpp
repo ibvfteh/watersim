@@ -10,8 +10,7 @@
 #include "renderer/material/pipeline_layout.h"
 
 estun::GraphicsPipeline::GraphicsPipeline(
-    const std::string vertexShaderName,
-    const std::string fragmentShaderName,
+    const std::vector<Shader> shaders,
     std::unique_ptr<RenderPass> &renderPass,
     std::shared_ptr<Descriptor> descriptor,
     VkSampleCountFlagBits msaa,
@@ -21,11 +20,11 @@ estun::GraphicsPipeline::GraphicsPipeline(
       descriptor_(descriptor)
 {
     // Load shaders.
-    vertShaderModule_ = std::make_unique<ShaderModule>(vertexShaderName);
-    fragShaderModule_ = std::make_unique<ShaderModule>(fragmentShaderName);
-
-    shaderStages_.push_back(vertShaderModule_->CreateShaderStage(VK_SHADER_STAGE_VERTEX_BIT));
-    shaderStages_.push_back(fragShaderModule_->CreateShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT));
+    for (auto & s : shaders)
+    {
+        shaderModules.push_back(std::make_shared<ShaderModule>(s.name));
+        shaderStages_.push_back(shaderModules.back()->CreateShaderStage(s.bits));
+    }
 
     Create(renderPass);
 }
@@ -127,7 +126,7 @@ void estun::GraphicsPipeline::Create(std::unique_ptr<RenderPass> &renderPass)
     // Create graphic pipeline
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    pipelineInfo.stageCount = 2;
+    pipelineInfo.stageCount = shaderStages_.size();
     pipelineInfo.pStages = shaderStages_.data();
     pipelineInfo.pVertexInputState = &vertexInputInfo;
     pipelineInfo.pInputAssemblyState = &inputAssembly;

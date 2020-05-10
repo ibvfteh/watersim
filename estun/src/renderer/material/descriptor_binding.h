@@ -12,6 +12,7 @@ namespace estun
 {
 
 class Descriptable;
+template <class T>
 class UniformBuffer;
 template <class T>
 class StorageBuffer;
@@ -36,7 +37,8 @@ struct DescriptorBinding
     {
     }
 
-    static DescriptorBinding Uniform(uint32_t binding, std::vector<class UniformBuffer> &uniformBuffers, VkShaderStageFlags stage)
+	template <class T>
+    static DescriptorBinding Uniform(uint32_t binding, std::vector<UniformBuffer<T>> &uniformBuffers, VkShaderStageFlags stage)
     {
         std::vector<Descriptable*> descriptables = {};
         for (int i = 0; i < uniformBuffers.size(); i++)
@@ -75,10 +77,16 @@ struct DescriptorBinding
         return DescriptorBinding(binding, descriptables, 1, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV, stage);
     }
 */
-    static DescriptorBinding ImageHolder(uint32_t binding, ImageHolder &imageHolder, VkShaderStageFlags stage)
+    static DescriptorBinding ImageSampler(uint32_t binding, std::shared_ptr<ImageHolder> imageHolder, VkShaderStageFlags stage)
     {
-        std::vector<Descriptable*> descriptables = {&imageHolder};
-        return DescriptorBinding(binding, descriptables, 1, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV, stage);
+        std::vector<Descriptable*> descriptables = {imageHolder.get()};
+        return DescriptorBinding(binding, descriptables, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, stage);
+    }
+
+    static DescriptorBinding StorageImage(uint32_t binding, std::shared_ptr<ImageHolder> imageHolder, VkShaderStageFlags stage)
+    {
+        std::vector<Descriptable*> descriptables = {imageHolder.get()};
+        return DescriptorBinding(binding, descriptables, 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, stage);
     }
 };
 

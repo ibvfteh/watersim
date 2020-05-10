@@ -16,6 +16,7 @@ estun::DepthResources::DepthResources(const VkExtent2D &extent, VkSampleCountFla
                   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                   VK_IMAGE_ASPECT_DEPTH_BIT)
 {
+    layout_ =  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 }
 
 estun::DepthResources::~DepthResources()
@@ -68,6 +69,7 @@ estun::ColorResources::ColorResources(const VkExtent2D &extent, VkSampleCountFla
                   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                   VK_IMAGE_ASPECT_COLOR_BIT)
 {
+    layout_ =  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 }
 
 estun::ColorResources::~ColorResources()
