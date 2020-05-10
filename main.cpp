@@ -18,7 +18,7 @@ float lastX = WIDTH / 2.0f;
 float lastY = HEIGHT / 2.0f;
 bool firstMouse = true;
 
-Camera camera(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+Camera camera(glm::vec3(0.0f, 2.5f, 5.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 
 void processInput(int key, int scancode, int action, int mods);
 void mouse_callback(double xpos, double ypos);
