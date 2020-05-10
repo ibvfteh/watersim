@@ -69,16 +69,9 @@ void estun::Instance::CreateInstance(const char *app_name,
         extensions.push_back(extention);
     }
 
-    VkValidationFeatureEnableEXT enables[] = {
-        VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT};
-    VkValidationFeaturesEXT features = {};
-    features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-    features.enabledValidationFeatureCount = 1;
-    features.pEnabledValidationFeatures = enables;
-
     VkInstanceCreateInfo createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.pNext = &features;
+    createInfo.pNext = nullptr;
     createInfo.flags = 0;
     createInfo.pApplicationInfo = &applicationInfo;
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
