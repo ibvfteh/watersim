@@ -27,7 +27,7 @@ void mouse_button_callback(int button, int action, int mods);
 void framebuffer_size_callback(int width, int height);
 
 estun::WindowConfig winConf = {"Water Simulation", WIDTH, HEIGHT, "assets/textures/icon.png", false, false, true};
-estun::GameInfo info("test", {0, 0, 1}, WIDTH, HEIGHT, true, false);
+estun::GameInfo info("test", {0, 0, 1}, WIDTH, HEIGHT, true, true);
 std::unique_ptr<estun::Window> window;
 
 struct LightUBO

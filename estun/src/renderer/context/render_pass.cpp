@@ -88,6 +88,8 @@ estun::RenderPass::RenderPass(bool msaa, VkImageLayout colorFinal, VkImageLayout
         renderPassInfo.pSubpasses = &subpass;
         renderPassInfo.dependencyCount = 1;
         renderPassInfo.pDependencies = &dependency;
+
+        VK_CHECK_RESULT(vkCreateRenderPass(DeviceLocator::GetLogicalDevice(), &renderPassInfo, nullptr, &renderPass), "Failed to create render pass");
     }
     else
     {
@@ -100,9 +102,9 @@ estun::RenderPass::RenderPass(bool msaa, VkImageLayout colorFinal, VkImageLayout
         renderPassInfo.pSubpasses = &subpass;
         renderPassInfo.dependencyCount = 1;
         renderPassInfo.pDependencies = &dependency;
-    }
 
-    VK_CHECK_RESULT(vkCreateRenderPass(DeviceLocator::GetLogicalDevice(), &renderPassInfo, nullptr, &renderPass), "Failed to create render pass");
+        VK_CHECK_RESULT(vkCreateRenderPass(DeviceLocator::GetLogicalDevice(), &renderPassInfo, nullptr, &renderPass), "Failed to create render pass");
+    }
 }
 
 estun::RenderPass::~RenderPass()
