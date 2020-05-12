@@ -3,6 +3,8 @@
 #include "renderer/common.h"
 #include "includes/glm.h"
 #include "renderer/material/descriptable.h"
+#include "renderer/buffers/buffer.h"
+#include "renderer/device_memory.h"
 
 namespace estun
 {

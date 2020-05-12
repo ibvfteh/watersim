@@ -8,6 +8,7 @@ estun::RenderPass::RenderPass(bool msaa, VkImageLayout colorFinal, VkImageLayout
 {
     ContextLocator::GetContext();
     VkAttachmentDescription colorAttachment = {};
+    colorAttachment.flags = 0;
     colorAttachment.format = ContextLocator::GetSwapChain()->GetFormat();
     colorAttachment.samples = ContextLocator::GetContext()->GetMsaaSamples();
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -26,6 +27,7 @@ estun::RenderPass::RenderPass(bool msaa, VkImageLayout colorFinal, VkImageLayout
     }
 
     VkAttachmentDescription depthAttachment = {};
+    depthAttachment.flags = 0;
     depthAttachment.format = DepthResources::FindDepthFormat();
     depthAttachment.samples = ContextLocator::GetContext()->GetMsaaSamples();
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -62,6 +64,7 @@ estun::RenderPass::RenderPass(bool msaa, VkImageLayout colorFinal, VkImageLayout
     if (msaa)
     {
         VkAttachmentDescription colorAttachmentResolve = {};
+        colorAttachmentResolve.flags = 0;
         colorAttachmentResolve.format = ContextLocator::GetSwapChain()->GetFormat();
         colorAttachmentResolve.samples = VK_SAMPLE_COUNT_1_BIT;
         colorAttachmentResolve.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;

@@ -3,6 +3,7 @@
 #include "renderer/common.h"
 #include "renderer/material/push_constant.h"
 #include "renderer/material/descriptor_sets.h"
+#include "renderer/material/pipeline_layout.h"
 
 namespace estun
 {
@@ -11,7 +12,6 @@ namespace estun
     class DescriptorSets;
     class DescriptorPool;
     class DescriptorSetLayout;
-    class PipelineLayout;
     class TopLevelAccelerationStructure;
     class Buffer;
     class Texture;

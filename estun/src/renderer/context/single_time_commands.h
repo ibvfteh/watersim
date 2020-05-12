@@ -58,8 +58,8 @@ public:
 
         const auto queue = DeviceLocator::GetDevice().GetComputeQueue();
 
-        VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, nullptr));
-        VK_CHECK_RESULT(vkQueueWaitIdle(queue));
+        vkQueueSubmit(queue, 1, &submitInfo, nullptr);
+        vkQueueWaitIdle(queue);
     }
 
     static void SubmitTransfer(CommandPool &commandPool, const std::function<void(VkCommandBuffer)> &action)
